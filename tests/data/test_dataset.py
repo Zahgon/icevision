@@ -1,4 +1,6 @@
-from icevision.all import *
+import numpy as np
+
+from icevision.data.dataset import Dataset
 
 
 def test_dataset_from_images():

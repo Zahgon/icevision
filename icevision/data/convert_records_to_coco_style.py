@@ -8,11 +8,15 @@ __all__ = [
     "create_coco_eval",
 ]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
+from collections import defaultdict
+from pathlib import Path
+from typing import Optional, Sequence
+
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
+
+from icevision.core.mask import MaskArray
+from icevision.utils.utils import pbar, allequal
 
 
 def create_coco_api(coco_records) -> COCO:

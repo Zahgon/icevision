@@ -1,6 +1,10 @@
+from operator import itemgetter
+
+import numpy as np
 import pytest
-import icevision
-from icevision.all import *
+import torchvision
+
+from icevision.data.convert_records_to_coco_style import convert_records_to_coco_style, coco_api_from_records
 
 
 @pytest.fixture()
@@ -9,9 +13,8 @@ def coco_records(coco_mask_records):
 
 
 @pytest.fixture()
-def expected_records():
-    source = Path(icevision.__file__).parent.parent / "samples"
-    dataset = torchvision.datasets.CocoDetection(source, source / "annotations.json")
+def expected_records(samples_source):
+    dataset = torchvision.datasets.CocoDetection(samples_source, samples_source / "annotations.json")
     return dataset.coco.dataset
 
 
