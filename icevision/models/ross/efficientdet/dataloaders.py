@@ -7,8 +7,11 @@ __all__ = [
     "infer_dl",
 ]
 
-from icevision.imports import *
-from icevision.models.utils import *
+import torch
+from torch.utils.data import DataLoader
+from torchvision.transforms.functional import to_tensor
+
+from icevision.models.utils import transform_dl
 
 
 def train_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
@@ -96,8 +99,8 @@ def build_train_batch(records):
 
     # convert to tensors
     batch_images = torch.stack(batch_images)
-    batch_bboxes = [tensor(bboxes, dtype=torch.float32) for bboxes in batch_bboxes]
-    batch_classes = [tensor(classes, dtype=torch.float32) for classes in batch_classes]
+    batch_bboxes = [torch.tensor(bboxes, dtype=torch.float32) for bboxes in batch_bboxes]
+    batch_classes = [torch.tensor(classes, dtype=torch.float32) for classes in batch_classes]
 
     # convert to EffDet interface
     targets = dict(bbox=batch_bboxes, cls=batch_classes)
@@ -154,8 +157,8 @@ def build_infer_batch(records):
 
     # convert to tensors
     batch_images = torch.stack(batch_images)
-    batch_sizes = tensor(batch_sizes, dtype=torch.float32)
-    batch_scales = tensor(batch_scales, dtype=torch.float32)
+    batch_sizes = torch.tensor(batch_sizes, dtype=torch.float32)
+    batch_scales = torch.tensor(batch_scales, dtype=torch.float32)
 
     # convert to EffDet interface
     targets = dict(img_size=batch_sizes, img_scale=batch_scales)

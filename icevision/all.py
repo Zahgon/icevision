@@ -1,6 +1,6 @@
 from icevision.imports import *
-from icevision import *
-
+# from icevision import *
+#
 # soft import icedata
 try:
     import icedata

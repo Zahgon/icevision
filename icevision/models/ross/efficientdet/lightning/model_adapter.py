@@ -1,8 +1,12 @@
 __all__ = ["ModelAdapter"]
 
-from icevision.imports import *
-from icevision.metrics import *
+from abc import ABC
+from typing import List
+
+from torch import nn
+
 from icevision.engines.lightning.lightning_model_adapter import LightningModelAdapter
+from icevision.metrics import Metric
 from icevision.models.ross import efficientdet
 
 
@@ -69,7 +73,7 @@ class ModelAdapter(LightningModelAdapter, ABC):
             detection_threshold=0.0,
         )
 
-    def validation_epoch_end(self, outs):
+    def on_validation_epoch_end(self):
         self.finalize_metrics()
 
     def test_step(self, batch, batch_idx):

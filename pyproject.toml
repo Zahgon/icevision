@@ -20,7 +20,6 @@ classifiers = [
 dependencies = [
     "torch==1.13.1",
     "torchvision==0.14.1",
-    "notebook<7",
     "loguru",
     "albumentations>=1.0.3,<1.1",
     "tqdm",
@@ -31,11 +30,15 @@ dependencies = [
     "pycocotools>=2.0.2",
     "lightning>=2.2.5",
     "scikit-learn>=1.5.2",
+    "effdet>=0.4.1",
 ]
 
 
 [dependency-groups]
 dev = [
+    "icedata>=0.5.1",
+    "ipywidgets>=8.1.5",
+    "notebook<7",
     "pytest-mock>=3.14.0",
     "pytest>=8.3.3",
 ]

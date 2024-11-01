@@ -2,14 +2,12 @@ from icevision.models.utils import filter_params
 from icevision.models.interpretation import get_stats, sort_losses, get_weighted_sum
 
 from icevision.models import torchvision
+from icevision.models import ross
+from icevision.models.ross import efficientdet
 
 # Soft dependencies
 from icevision.soft_dependencies import SoftDependencies, _SoftDependencies
 
-if SoftDependencies.effdet:
-    # backwards compatibility
-    from icevision.models.ross import efficientdet
-    from icevision.models import ross
 
 if SoftDependencies.mmdet:
     from icevision.models import mmdet

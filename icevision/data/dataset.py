@@ -26,7 +26,7 @@ class Dataset:
 
     def __init__(
         self,
-        records: List[dict],
+        records: List[BaseRecord],
         tfm: Optional[Transform] = None,
     ):
         self.records = records

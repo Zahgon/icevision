@@ -1,6 +1,6 @@
 __all__ = ["loss_fn"]
 
-from icevision.imports import *
+import torch
 
 
 def loss_fn(preds, targets) -> torch.Tensor:

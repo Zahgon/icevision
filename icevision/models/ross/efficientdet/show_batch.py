@@ -1,8 +1,5 @@
 __all__ = ["show_batch"]
 
-from icevision.utils import *
-from icevision.visualize import *
-
 
 def show_batch(batch, ncols: int = 1, figsize=None, **show_samples_kwargs):
     """Show a single batch from a dataloader.

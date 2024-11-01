@@ -1,16 +1,14 @@
 __all__ = ["RCNNModelAdapter"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.metrics import *
+from abc import ABC, abstractmethod
+from typing import Sequence
+
+from torch import nn
+
 from icevision.engines.lightning.lightning_model_adapter import LightningModelAdapter
+from icevision.metrics import Metric
 from icevision.models.torchvision.loss_fn import loss_fn
-from icevision.core.record_components import (
-    InstanceMasksRecordComponent,
-    BBoxesRecordComponent,
-)
-from icevision.core.mask import MaskArray
-from icevision.core.bbox import BBox
+
 
 
 class RCNNModelAdapter(LightningModelAdapter, ABC):

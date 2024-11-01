@@ -1,12 +1,14 @@
 __all__ = ["model"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.models.ross.efficientdet.utils import *
-from icevision.models.ross.efficientdet.backbones import *
-from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain, unwrap_bench
+from types import MethodType
+from typing import List
+
+from torch import nn
+from effdet import get_efficientdet_config, unwrap_bench
 from effdet import create_model_from_config
-from effdet.efficientdet import HeadNet
+
+from icevision.models.ross.efficientdet.utils import EfficientDetBackboneConfig
+from icevision.utils.torch_utils import check_all_model_params_in_groups2
 
 
 def model(

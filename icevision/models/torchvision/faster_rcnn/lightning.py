@@ -1,7 +1,7 @@
 __all__ = ["ModelAdapter"]
 
-from icevision.models.torchvision.lightning_model_adapter import *
-from icevision.models.torchvision.faster_rcnn.prediction import *
+from icevision.models.torchvision.faster_rcnn.prediction import convert_raw_predictions
+from icevision.models.torchvision.lightning_model_adapter import RCNNModelAdapter
 
 
 class ModelAdapter(RCNNModelAdapter):

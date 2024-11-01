@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from icevision.core.class_map import ClassMap
 from icevision.core.record_type import RecordType
 from icevision.data.prediction import Prediction
-from icevision.utils.imageio import show_img
+from icevision.utils.imageio import show_img, plot_grid
 from icevision.utils.utils import denormalize_imagenet
 from icevision.utils.partial import partial
 from icevision.visualize.draw_data import draw_sample, draw_pred, draw_record

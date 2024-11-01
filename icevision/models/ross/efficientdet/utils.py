@@ -2,7 +2,6 @@ __all__ = [
     "EfficientDetBackboneConfig",
 ]
 
-from icevision.imports import *
 from icevision.models.backbone_config import BackboneConfig
 
 
