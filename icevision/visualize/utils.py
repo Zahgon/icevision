@@ -7,11 +7,14 @@ __all__ = [
     "rand_cmap",
 ]
 
-from icevision.imports import *
-from icevision.utils import *
+from typing import Union
+
+import numpy as np
 from matplotlib import patches
-from PIL import Image, ImageFont, ImageDraw
-import PIL
+import PIL.Image, PIL.ImageDraw, PIL.ImageColor
+from loguru import logger
+
+from icevision.utils.data_dir import get_root_dir
 
 
 def draw_label(ax, x, y, name, color, fontsize=18):

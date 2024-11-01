@@ -1,8 +1,6 @@
-from icevision.models.torchvision.loss_fn import *
-
 from icevision.models.torchvision.faster_rcnn import backbones
-from icevision.models.torchvision.dataloaders import *
-from icevision.models.torchvision.faster_rcnn.model import *
+from icevision.models.torchvision.dataloaders import train_dl, valid_dl, infer_dl
+from icevision.models.torchvision.faster_rcnn.model import model
 from icevision.models.torchvision.faster_rcnn.prediction import *
 from icevision.models.torchvision.faster_rcnn.show_batch import *
 from icevision.models.torchvision.faster_rcnn.show_results import *

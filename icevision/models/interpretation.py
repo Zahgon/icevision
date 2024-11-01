@@ -7,9 +7,15 @@ __all__ = [
     "_move_to_device",
 ]
 
+from typing import List, Union, Tuple
 
-from icevision.utils import *
-from icevision.data import *
+import numpy as np
+import torch
+from torch import nn
+
+from icevision.data.dataset import Dataset
+from icevision.utils.torch_utils import tensor_to_image, model_device
+from icevision.utils.utils import pbar
 from icevision.visualize.show_data import show_preds
 from icevision.core.record_components import LossesRecordComponent
 

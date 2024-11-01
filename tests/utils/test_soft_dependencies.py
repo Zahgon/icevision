@@ -1,4 +1,4 @@
-from icevision.soft_dependencies import *
+from icevision.soft_dependencies import soft_import, SoftDependencies
 
 
 def test_soft_import():

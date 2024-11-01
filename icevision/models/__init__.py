@@ -1,5 +1,5 @@
-from icevision.models.utils import *
-from icevision.models.interpretation import *
+from icevision.models.utils import filter_params
+from icevision.models.interpretation import get_stats, sort_losses, get_weighted_sum
 
 from icevision.models import torchvision
 

@@ -10,17 +10,24 @@ __all__ = [
     "AlbumentationsIsCrowdsComponent",
 ]
 
+from dataclasses import dataclass
+from typing import Callable, List
+
 import albumentations as A
 from itertools import chain
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.tfms.transform import *
+import numpy as np
+
+from icevision.core.bbox import BBox
+from icevision.core.components.composite import Component, Composite
+from icevision.core.keypoints import KeyPoints
+from icevision.core.mask import MaskArray, Polygon, RLE
 from icevision.tfms.albumentations.albumentations_helpers import (
     get_size_without_padding,
     get_transform,
 )
+from icevision.tfms.transform import Transform
+from icevision.utils.imageio import ImgSize
 
 
 @dataclass

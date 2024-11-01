@@ -1,4 +1,4 @@
-from icevision.all import *
+from icevision.utils.get_files import get_image_files
 
 
 def test_get_image_files():

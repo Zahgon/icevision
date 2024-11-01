@@ -1,7 +1,7 @@
 __all__ = ["soft_import", "SoftDependencies"]
 
 import importlib
-from typing import *
+from typing import Dict
 
 
 def soft_import(name: str):

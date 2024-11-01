@@ -37,7 +37,7 @@ def _build_train_sample(
 ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
     assert len(record.detection.label_ids) == len(record.detection.bboxes)
 
-    image = im2tensor(record.img)
+    image = to_tensor(record.img)
 
     # If no labels and bboxes are present, use as negative samples
     if len(record.detection.label_ids) == 0:
@@ -175,7 +175,7 @@ def build_infer_batch(records: Sequence[RecordType]):
     outs = model(*batch)
     ```
     """
-    tensor_imgs = [im2tensor(record.img) for record in records]
+    tensor_imgs = [to_tensor(record.img) for record in records]
     tensor_imgs = torch.stack(tensor_imgs)
 
     return (tensor_imgs,), records

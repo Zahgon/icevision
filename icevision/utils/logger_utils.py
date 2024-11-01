@@ -1,6 +1,9 @@
 __all__ = ["logger_default_config", "autofix_log", "ReplaySink"]
 
-from icevision.imports import *
+import sys
+from typing import Optional, Any
+
+from loguru import logger
 
 logger.level("AUTOFIX", 25)
 logger.level("AUTOFIX-START", 25, color="<fg #1f6f8b><bold>")

@@ -75,7 +75,7 @@ def _img_meta(record):
 def build_train_batch(records: Sequence[BaseRecord]):
     images, masks, img_metas = [], [], []
     for record in records:
-        images.append(im2tensor(record.img))
+        images.append(to_tensor(record.img))
         img_metas.append(_img_meta_mask(record))
         masks.append(tensor(record.segmentation.mask_array.data).long())
 
@@ -95,7 +95,7 @@ def build_infer_batch(
 
     images = []
     for record in records:
-        images.append(im2tensor(record.img))
+        images.append(to_tensor(record.img))
 
     data = {
         "img": [torch.stack(images)],

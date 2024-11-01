@@ -13,15 +13,22 @@ __all__ = [
     "draw_segmentation_mask",
 ]
 
-from icevision.imports import *
-from icevision.data import *
-from icevision.core import *
-from icevision.visualize.utils import *
+import itertools
+import os
+from typing import Optional, Union, Callable, List, Tuple
+
+import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-# This should probably move elsewhere
-from PIL import Image, ImageFont, ImageDraw
-import PIL
+import PIL.Image, PIL.ImageFilter
+
+from icevision.core.bbox import BBox
+from icevision.core.class_map import ClassMap
+from icevision.core.keypoints import KeyPoints
+from icevision.core.mask import MaskArray
+from icevision.core.record_components import InstancesLabelsRecordComponent, ClassificationLabelsRecordComponent
+from icevision.data.prediction import Prediction
+from icevision.visualize.utils import get_default_font, rand_cmap, as_rgb_tuple
 
 DEFAULT_FONT_PATH = get_default_font()
 
@@ -586,7 +593,7 @@ def draw_mask(
 
     # Now create a second mask and draw the desired color on top of the
     # border mask. If `border_thickness` is 0, this replaces the border mask
-    _mask = Image.fromarray(mask_arr)
+    _mask = PIL.Image.fromarray(mask_arr)
     _mask = _mask.filter(PIL.ImageFilter.MinFilter(border_thickness))
     _mask_idx = np.where(_mask.convert("L", palette=Image.ADAPTIVE))
     mask_arr[_mask_idx] = np.append(color[:3], blend * 255)

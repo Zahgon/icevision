@@ -1,6 +1,6 @@
 __all__ = ["get_data_dir", "get_root_dir"]
 
-from icevision.imports import *
+from pathlib import Path
 
 root_dir = Path.home() / ".icevision"
 root_dir.mkdir(exist_ok=True)

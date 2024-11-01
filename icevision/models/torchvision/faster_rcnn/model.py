@@ -1,17 +1,17 @@
 __all__ = ["model"]
 
-from icevision.imports import *
-from icevision.models.torchvision.faster_rcnn.backbones import (
-    resnet_fpn_configs as resnet_fpn,
-)
-from icevision.models.torchvision.utils import *
-from icevision.models.torchvision.backbone_config import TorchvisionBackboneConfig
+from typing import Optional
 
+from torch import nn
 from torchvision.models.detection.faster_rcnn import (
     fasterrcnn_resnet50_fpn,
     FasterRCNN,
-    FastRCNNPredictor,
+    FastRCNNPredictor
 )
+
+from icevision.models.torchvision.faster_rcnn.backbones import resnet_fpn_configs as resnet_fpn
+from icevision.models.torchvision.backbone_config import TorchvisionBackboneConfig
+from icevision.models.torchvision.utils import patch_rcnn_param_groups, remove_internal_model_transforms
 
 
 def model(

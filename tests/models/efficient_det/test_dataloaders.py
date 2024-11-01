@@ -93,7 +93,7 @@ def test_efficient_det_valid_dataloader(records):
 def test_efficient_det_build_infer_batch(records, img):
     batch, records = efficientdet.build_infer_batch(records)
 
-    tensor_img = torch.stack([im2tensor(img), im2tensor(img)])
+    tensor_img = torch.stack([to_tensor(img), to_tensor(img)])
     img_sizes = tensor([(4, 4), (4, 4)], dtype=torch.float)
     img_scales = tensor([1, 1], dtype=torch.float)
     img_info = {"img_size": img_sizes, "img_scale": img_scales}
@@ -116,7 +116,7 @@ def test_efficient_det_infer_dl(records, batch_tfms, img):
         )
     )
 
-    tensor_img = torch.stack([im2tensor(img), im2tensor(img)])
+    tensor_img = torch.stack([to_tensor(img), to_tensor(img)])
     img_sizes = tensor([(4, 4), (4, 4)], dtype=torch.float)
     img_scales = tensor([1, 1], dtype=torch.float)
     img_info = {"img_size": img_sizes, "img_scale": img_scales}

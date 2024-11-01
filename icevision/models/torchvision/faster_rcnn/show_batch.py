@@ -1,8 +1,8 @@
 __all__ = ["show_batch"]
 
-from icevision.utils import *
-from icevision.visualize import *
-from icevision.models.utils import *
+from icevision.models.utils import unpack_batch
+from icevision.utils.torch_utils import tensor_to_image
+from icevision.visualize.show_data import show_samples
 
 
 def show_batch(batch, ncols: int = 1, figsize=None, **show_samples_kwargs):

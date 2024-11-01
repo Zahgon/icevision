@@ -3,7 +3,8 @@ __all__ = ["load_txt", "create_tmp_dir", "mkdir", "extract_files"]
 import numpy as np
 import shutil
 from pathlib import Path
-from .utils import pbar
+
+from icevision.utils.utils import pbar
 
 
 def load_txt(file):

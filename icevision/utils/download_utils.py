@@ -5,7 +5,11 @@ __all__ = [
     "download_and_extract_gdrive",
 ]
 
-from icevision.imports import *
+import shutil
+from pathlib import Path
+from typing import Union
+
+from tqdm import tqdm
 import requests
 
 

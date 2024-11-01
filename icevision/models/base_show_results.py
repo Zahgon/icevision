@@ -1,10 +1,13 @@
 __all__ = ["base_show_results"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.visualize import *
-from icevision.data import *
+import random
+from typing import Optional
+
+from torch import nn
+
+from icevision.data.dataset import Dataset
+from icevision.utils.utils import denormalize_imagenet
+from icevision.visualize.show_data import show_preds
 
 
 def base_show_results(

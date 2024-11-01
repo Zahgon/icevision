@@ -13,7 +13,9 @@ from pathlib import Path
 from typing import Union, Tuple, List
 
 import PIL.ExifTags, PIL.Image
+import math
 import numpy as np
+import rasterio
 from loguru import logger
 
 ImgSize = namedtuple("ImgSize", "width,height")

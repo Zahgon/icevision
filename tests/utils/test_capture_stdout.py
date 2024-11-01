@@ -1,4 +1,4 @@
-from icevision.all import *
+from icevision.utils.capture_stdout import CaptureStdout
 
 
 def test_capture_stdout_simple():

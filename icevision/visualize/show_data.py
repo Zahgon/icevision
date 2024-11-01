@@ -7,12 +7,16 @@ __all__ = [
     "show_preds",
 ]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.parsers import *
-from icevision.data import *
-from icevision.visualize.draw_data import *
+from typing import Optional, Tuple, Sequence
+import matplotlib.pyplot as plt
+
+from icevision.core.class_map import ClassMap
+from icevision.core.record_type import RecordType
+from icevision.data.prediction import Prediction
+from icevision.utils.imageio import show_img
+from icevision.utils.utils import denormalize_imagenet
+from icevision.utils.partial import partial
+from icevision.visualize.draw_data import draw_sample, draw_pred
 
 
 def show_sample(

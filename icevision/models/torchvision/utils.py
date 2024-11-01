@@ -4,9 +4,13 @@ __all__ = [
     "patch_retinanet_param_groups",
 ]
 
-from icevision.imports import *
-from icevision.utils import *
+from types import MethodType
+from typing import Optional, Dict, Tuple, List
+
+from torch import Tensor, nn
 from torchvision.models.detection.generalized_rcnn import GeneralizedRCNN
+
+from icevision.utils.torch_utils import check_all_model_params_in_groups2
 
 
 def _noop_normalize(image: Tensor) -> Tensor:

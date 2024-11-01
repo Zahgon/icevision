@@ -9,12 +9,15 @@ __all__ = [
     "unpack_batch",
 ]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.data import *
-from icevision.parsers import *
+from typing import Generator, List
+
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+
 from icevision.data.dataset import Dataset
+from icevision.data.prediction import Prediction
+from icevision.utils.utils import pbar
 
 BN_TYPES = (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)
 

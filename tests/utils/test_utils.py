@@ -1,5 +1,8 @@
-from icevision.all import *
+import numpy as np
+
+from icevision import models
 from icevision.core.record_components import LossesRecordComponent
+from icevision.utils.utils import notnone, ifnotnone, last, cleandict, allequal, mergeds, denormalize, normalize
 
 
 def test_notnone():

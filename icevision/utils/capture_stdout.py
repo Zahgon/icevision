@@ -1,6 +1,6 @@
 __all__ = ["CaptureStdout"]
 
-from icevision.imports import *
+import sys
 from io import StringIO
 
 

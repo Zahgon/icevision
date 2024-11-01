@@ -1,6 +1,10 @@
+import random
+
+import PIL.Image
+import numpy as np
 import pytest
-from icevision.all import *
-from icevision.utils.imageio import open_gray_scale_image
+
+from icevision.utils.imageio import open_gray_scale_image, open_img, get_img_size, get_img_size_from_data, ImgSize
 
 
 @pytest.mark.parametrize(
@@ -271,7 +275,7 @@ def test_get_img_size_from_data_returns_img_size_when_data_is_pil_img():
 
     img_size = get_img_size_from_data(data)
 
-    img_size == ImgSize(width=expected_width, height=expected_height)
+    assert img_size == ImgSize(width=expected_width, height=expected_height)
 
 
 def test_get_img_size_from_data_returns_img_size_when_data_is_numpy_array_with_2_dimensions():
@@ -281,7 +285,7 @@ def test_get_img_size_from_data_returns_img_size_when_data_is_numpy_array_with_2
 
     img_size = get_img_size_from_data(data)
 
-    img_size == ImgSize(width=expected_width, height=expected_height)
+    assert img_size == ImgSize(width=expected_width, height=expected_height)
 
 
 def test_get_img_size_from_data_returns_img_size_when_data_is_numpy_array_with_3_dimensions():
@@ -294,7 +298,7 @@ def test_get_img_size_from_data_returns_img_size_when_data_is_numpy_array_with_3
 
     img_size = get_img_size_from_data(data)
 
-    img_size == ImgSize(width=expected_width, height=expected_height)
+    assert img_size == ImgSize(width=expected_width, height=expected_height)
 
 
 def test_get_img_size_from_data_raises_an_exception_when_data_is_not_pil_img_or_numpy_array():

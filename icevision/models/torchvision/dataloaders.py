@@ -7,9 +7,14 @@ __all__ = [
     "infer_dl",
 ]
 
-from icevision.imports import *
-from icevision.core import *
-from icevision.models.utils import *
+from typing import Tuple, Dict, Sequence, List
+
+import torch
+from torch.utils.data import DataLoader
+from torchvision.transforms.functional import to_tensor
+
+from icevision.core.record_type import RecordType
+from icevision.models.utils import transform_dl
 
 
 def train_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
@@ -77,7 +82,7 @@ def _build_train_sample(
 ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
     assert len(record.detection.label_ids) == len(record.detection.bboxes)
 
-    image = im2tensor(record.img)
+    image = to_tensor(record.img)
     target = {}
 
     # If no labels and bboxes are present, use as negative samples as described in
@@ -86,9 +91,9 @@ def _build_train_sample(
         target["labels"] = torch.zeros(0, dtype=torch.int64)
         target["boxes"] = torch.zeros((0, 4), dtype=torch.float32)
     else:
-        target["labels"] = tensor(record.detection.label_ids, dtype=torch.int64)
+        target["labels"] = torch.tensor(record.detection.label_ids, dtype=torch.int64)
         xyxys = [bbox.xyxy for bbox in record.detection.bboxes]
-        target["boxes"] = tensor(xyxys, dtype=torch.float32)
+        target["boxes"] = torch.tensor(xyxys, dtype=torch.float32)
 
     return image, target
 
@@ -168,7 +173,7 @@ def build_infer_batch(records: Sequence[RecordType]):
     outs = model(*batch)
     ```
     """
-    tensor_imgs = [im2tensor(record.img) for record in records]
+    tensor_imgs = [to_tensor(record.img) for record in records]
     tensor_imgs = torch.stack(tensor_imgs)
 
     return (tensor_imgs,), records

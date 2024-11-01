@@ -1,7 +1,8 @@
 __all__ = ["Prediction"]
 
-from icevision.imports import *
-from icevision.core import *
+from typing import Optional
+
+from icevision.core.record import BaseRecord
 
 
 class Prediction:
