@@ -1,5 +1,10 @@
+import numpy as np
 import pytest
-from icevision.all import *
+from matplotlib import pyplot as plt
+
+from icevision.core.bbox import BBox
+from icevision.data.data_splitter import SingleSplitSplitter
+from icevision.visualize.show_data import show_record, show_sample, show_pred
 
 
 def test_show_record(coco_record, monkeypatch):

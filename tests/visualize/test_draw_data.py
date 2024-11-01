@@ -1,6 +1,13 @@
+import numpy as np
 import pytest
+from matplotlib import pyplot as plt
+
+from icevision.core.bbox import BBox
+from icevision.core.keypoints import KeyPoints
 from icevision.parsers.coco_parser import COCOKeypointsMetadata
-from icevision.all import *
+from icevision.utils.imageio import show_img
+from icevision.utils.utils import denormalize_imagenet
+from icevision.visualize.draw_data import draw_record, draw_sample, draw_pred, draw_keypoints
 
 
 def test_draw_record(coco_record, monkeypatch):

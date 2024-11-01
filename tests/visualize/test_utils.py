@@ -1,5 +1,6 @@
 import pytest
-from icevision.all import *
+
+from icevision.visualize.utils import as_rgb_tuple
 
 
 @pytest.mark.parametrize(

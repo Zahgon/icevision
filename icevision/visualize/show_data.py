@@ -16,7 +16,7 @@ from icevision.data.prediction import Prediction
 from icevision.utils.imageio import show_img
 from icevision.utils.utils import denormalize_imagenet
 from icevision.utils.partial import partial
-from icevision.visualize.draw_data import draw_sample, draw_pred
+from icevision.visualize.draw_data import draw_sample, draw_pred, draw_record
 
 
 def show_sample(

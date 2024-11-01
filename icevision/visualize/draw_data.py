@@ -15,12 +15,14 @@ __all__ = [
 
 import itertools
 import os
+from pathlib import Path
 from typing import Optional, Union, Callable, List, Tuple
 
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-import PIL.Image, PIL.ImageFilter
+import PIL.Image, PIL.ImageFilter, PIL.ImageFont
+from PIL import ImageDraw
 
 from icevision.core.bbox import BBox
 from icevision.core.class_map import ClassMap
@@ -595,7 +597,7 @@ def draw_mask(
     # border mask. If `border_thickness` is 0, this replaces the border mask
     _mask = PIL.Image.fromarray(mask_arr)
     _mask = _mask.filter(PIL.ImageFilter.MinFilter(border_thickness))
-    _mask_idx = np.where(_mask.convert("L", palette=Image.ADAPTIVE))
+    _mask_idx = np.where(_mask.convert("L", palette=PIL.Image.ADAPTIVE))
     mask_arr[_mask_idx] = np.append(color[:3], blend * 255)
 
     # Create RGBA PIL mask image

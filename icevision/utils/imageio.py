@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Union, Tuple, List
 
 import PIL.ExifTags, PIL.Image
+from matplotlib import pyplot as plt
 import math
 import numpy as np
 import rasterio
