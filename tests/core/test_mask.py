@@ -1,5 +1,9 @@
+import json
+
+import numpy as np
 import pytest
-from icevision.all import *
+
+from icevision.core.mask import RLE, MaskArray, VocMaskFile, Polygon
 
 
 @pytest.fixture()

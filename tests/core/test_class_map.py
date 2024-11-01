@@ -1,5 +1,6 @@
 import pytest
-from icevision.all import *
+
+from icevision.core.class_map import ClassMap, BACKGROUND
 
 
 @pytest.fixture()

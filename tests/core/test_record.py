@@ -1,5 +1,14 @@
+import PIL.Image
+import numpy as np
 import pytest
-from icevision.all import *
+
+from icevision.core.bbox import BBox
+from icevision.core.class_map import ClassMap
+from icevision.core.exceptions import AutofixAbort
+from icevision.core.keypoints import KeypointsMetadata, KeyPoints
+from icevision.core.record import BaseRecord, autofix_records
+from icevision.core.record_components import BBoxesRecordComponent, InstancesLabelsRecordComponent, \
+    FilepathRecordComponent, GrayScaleRecordComponent, InstanceMasksRecordComponent, KeyPointsRecordComponent
 
 
 @pytest.fixture()

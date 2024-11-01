@@ -1,5 +1,10 @@
+import numpy as np
 import pytest
-from icevision.all import *
+
+from icevision.core.class_map import ClassMap
+from icevision.core.exceptions import AutofixAbort
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import ClassificationLabelsRecordComponent
 
 
 @pytest.fixture

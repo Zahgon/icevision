@@ -5,6 +5,9 @@ from typing import Optional, Any
 import numpy as np
 import torch
 
+from icevision.core.exceptions import InvalidDataError
+from icevision.utils.logger_utils import autofix_log
+
 
 class BBox:
     """Bounding Box representation.

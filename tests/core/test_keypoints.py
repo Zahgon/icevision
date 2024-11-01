@@ -1,6 +1,7 @@
+import numpy as np
+
+from icevision.core.keypoints import KeyPoints, KeypointConnection
 from icevision.parsers.coco_parser import COCOKeypointsMetadata
-import pytest
-from icevision.all import *
 
 
 def test_keypoints_simple(keypoints_img_128372):

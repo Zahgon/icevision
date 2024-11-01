@@ -1,5 +1,7 @@
 import pytest
-from icevision.all import *
+
+from icevision.core.bbox import BBox
+from icevision.core.exceptions import InvalidDataError
 
 
 def test_bbox_simple():

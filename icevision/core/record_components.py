@@ -29,11 +29,12 @@ import numpy as np
 from icevision.core.bbox import BBox
 from icevision.core.class_map import ClassMap
 from icevision.core.components.composite import TaskComponent
-from icevision.core.exceptions import AutofixAbort
+from icevision.core.exceptions import AutofixAbort, InvalidDataError
 from icevision.core.keypoints import KeyPoints
 from icevision.core.mask import MaskArray, Mask
 from icevision.utils.imageio import open_gray_scale_image, get_img_size_from_data, ImgSize, open_img
 from icevision.core import tasks
+from icevision.utils.logger_utils import autofix_log
 
 
 class RecordComponent(TaskComponent):

@@ -1,5 +1,5 @@
 import pytest
-from icevision.all import *
+from icevision.core.id_map import IDMap
 
 
 @pytest.fixture

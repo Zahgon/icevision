@@ -2,6 +2,8 @@ from copy import copy, deepcopy
 
 import pytest
 
+from icevision.core.components.composite import Component, Composite
+
 
 class MockComponent1(Component):
     order = 0.9
