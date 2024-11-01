@@ -17,7 +17,7 @@ from typing import List, Union, Sequence
 import numpy as np
 import torch
 import PIL.Image
-# from pycocotools import mask as mask_utils
+from pycocotools import mask as mask_utils
 
 from icevision.utils.imageio import open_img
 from icevision.utils.utils import lmap

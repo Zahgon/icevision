@@ -15,6 +15,7 @@ from icevision.core.id_map import IDMap
 from icevision.core.keypoints import KeypointsMetadata
 from icevision.core.record_components import RecordIDRecordComponent, ClassMapRecordComponent, FilepathRecordComponent, ImageRecordComponent, SizeRecordComponent, InstancesLabelsRecordComponent, BBoxesRecordComponent, \
     InstanceMasksRecordComponent, KeyPointsRecordComponent, AreasRecordComponent, IsCrowdsRecordComponent
+from icevision.data.data_splitter import SingleSplitSplitter
 from icevision.data.dataset import Dataset
 from icevision.data.record_collection import RecordCollection
 from icevision import parsers

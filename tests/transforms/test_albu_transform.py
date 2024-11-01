@@ -1,8 +1,11 @@
-from icevision.tfms.albumentations.albumentations_adapter import (
-    AlbumentationsMasksComponent,
-)
+import numpy as np
+
+from icevision.core.mask import MaskArray
+from icevision.data.data_splitter import SingleSplitSplitter
+from icevision.data.dataset import Dataset
+from icevision.tfms.albumentations.albumentations_adapter import AlbumentationsBBoxesComponent, \
+    AlbumentationsKeypointsComponent
 import pytest
-from icevision.all import *
 from albumentations import (
     LongestMaxSize,
     Normalize,
@@ -12,6 +15,9 @@ from icevision.tfms.albumentations.albumentations_helpers import (
     get_size_without_padding,
     get_transform,
 )
+from icevision import tfms
+from icevision.utils.imageio import ImgSize, open_img
+
 
 # TODO: Check that attributes are being set on components
 @pytest.fixture
@@ -120,7 +126,7 @@ def test_filter_keypoints():
         [0, 1, 1, 1, 2],
     )
     img_size = ImgSize(width=w, height=h)
-    tra_n = tfms.A.AlbumentationsKeypointsComponent._remove_albu_outside_keypoints(
+    tra_n = AlbumentationsKeypointsComponent._remove_albu_outside_keypoints(
         tfms_kps, v, img_size
     )
 
@@ -133,7 +139,7 @@ def test_filter_keypoints():
         120,
         [0, 1, 1, 1, 2],
     )
-    tra_n = tfms.A.AlbumentationsKeypointsComponent._remove_albu_outside_keypoints(
+    tra_n = AlbumentationsKeypointsComponent._remove_albu_outside_keypoints(
         tfms_kps, v, img_size
     )
 
@@ -146,7 +152,7 @@ def test_filter_boxes():
     out = (52.17503641656451, 274.5014178489639, 123.51860681160832, 320)
     h, w = 256, 384
 
-    res = tfms.A.AlbumentationsBBoxesComponent._clip_bboxes(inp, h, w)
+    res = AlbumentationsBBoxesComponent._clip_bboxes(inp, h, w)
     assert out == res
 
 

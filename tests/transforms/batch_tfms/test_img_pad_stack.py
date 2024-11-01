@@ -1,5 +1,9 @@
+import numpy as np
 import pytest
-from icevision.all import *
+
+from icevision import tfms
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import ImageRecordComponent
 
 
 @pytest.fixture()
