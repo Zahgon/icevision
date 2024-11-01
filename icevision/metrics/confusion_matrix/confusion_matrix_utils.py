@@ -1,7 +1,13 @@
 import collections
+from dataclasses import dataclass
+from typing import Dict, List, Collection
 
-from icevision.imports import *
-from icevision import BBox, BaseRecord
+import torch
+from torch import nn
+from torchvision.ops import box_iou
+
+from icevision.core.bbox import BBox
+from icevision.core.record import BaseRecord
 
 
 @dataclass(frozen=True)
@@ -121,7 +127,7 @@ def pairwise_iou_record_record(target: BaseRecord, prediction: BaseRecord):
     stacked_targets = (
         torch.stack(stacked_targets) if stacked_targets else torch.empty(0, 4)
     )
-    return torchvision.ops.box_iou(stacked_preds, stacked_targets)
+    return box_iou(stacked_preds, stacked_targets)
 
 
 def pairwise_iou_list_list(
@@ -137,7 +143,7 @@ def pairwise_iou_list_list(
     stacked_targets = (
         torch.stack(stacked_targets) if stacked_targets else torch.empty(0, 4)
     )
-    return torchvision.ops.box_iou(stacked_preds, stacked_targets)
+    return box_iou(stacked_preds, stacked_targets)
 
 
 def build_target_list(target: BaseRecord) -> List:

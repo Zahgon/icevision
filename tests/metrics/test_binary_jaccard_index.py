@@ -1,5 +1,14 @@
+import numpy as np
 import pytest
-from icevision.all import *
+
+from icevision.core import tasks
+from icevision.core.class_map import ClassMap
+from icevision.core.mask import MaskArray
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import SemanticMaskRecordComponent, ClassMapRecordComponent, ImageRecordComponent
+from icevision.data.prediction import Prediction
+from icevision.metrics.jaccard_index import BinaryJaccardIndex
+from icevision.utils.imageio import ImgSize
 
 
 @pytest.fixture()

@@ -1,10 +1,19 @@
 __all__ = ["SimpleConfusionMatrix"]
 
+import io
+from enum import Enum
+from typing import Collection, Optional
+
+import numpy as np
+import sklearn.metrics
+from lightning.pytorch import loggers
+from matplotlib import pyplot as plt
+
 from icevision.data.prediction import Prediction
 from icevision.metrics.metric import Metric
-from icevision.imports import *
-from icevision.metrics.confusion_matrix.confusion_matrix_utils import *
-import PIL
+from icevision.metrics.confusion_matrix.confusion_matrix_utils import match_predictions_to_targets, \
+    get_best_score_match
+import PIL.Image
 
 
 class MatchingPolicy(Enum):
@@ -145,7 +154,7 @@ class SimpleConfusionMatrix(Metric):
 
     def log(self, logger_object) -> None:
         # TODO: Disabled for now, need to design for metric logging for this to work + pl dependency
-        if isinstance(logger_object, pl_loggers.WandbLogger):
+        if isinstance(logger_object, loggers.WandbLogger):
             fig = self.plot()
             image = self._fig2img(fig)
             logger_object.experiment.log({"Confusion Matrix": wandb.Image(image)})

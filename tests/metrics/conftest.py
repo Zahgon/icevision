@@ -2,6 +2,12 @@ from copy import deepcopy
 
 import pytest
 
+from icevision.core.bbox import BBox
+from icevision.core.class_map import ClassMap
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import SizeRecordComponent, FilepathRecordComponent, \
+    InstancesLabelsRecordComponent, BBoxesRecordComponent, ScoresRecordComponent
+from icevision.utils.imageio import ImgSize
 
 
 @pytest.fixture

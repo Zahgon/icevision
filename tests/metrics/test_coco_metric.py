@@ -1,5 +1,9 @@
 import pytest
-from icevision.all import *
+
+from icevision.data.convert_records_to_coco_style import create_coco_eval
+from icevision.data.prediction import Prediction
+from icevision.metrics.coco_metric import COCOMetric
+from icevision.utils.capture_stdout import CaptureStdout
 
 
 @pytest.fixture()

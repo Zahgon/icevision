@@ -29,6 +29,8 @@ dependencies = [
     "rasterio>=1.3a1,<2",
     "matplotlib>=3.2.2,<4",
     "pycocotools>=2.0.2",
+    "lightning>=2.2.5",
+    "scikit-learn>=1.5.2",
 ]
 
 

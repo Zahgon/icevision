@@ -1,9 +1,5 @@
 __all__ = ["SegmentationAccuracy"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.data import *
-from icevision.metrics.metric import *
 
 
 class SegmentationAccuracy(Metric):

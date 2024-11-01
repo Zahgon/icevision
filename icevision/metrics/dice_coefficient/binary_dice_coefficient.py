@@ -1,9 +1,10 @@
 __all__ = ["BinaryDiceCoefficient"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.data import *
-from icevision.metrics.metric import *
+from typing import Dict
+
+import numpy as np
+
+from icevision.metrics.metric import Metric
 
 
 class BinaryDiceCoefficient(Metric):

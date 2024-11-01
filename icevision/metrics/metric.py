@@ -1,6 +1,7 @@
 __all__ = ["Metric"]
 
-from icevision.imports import *
+from abc import ABC, abstractmethod
+from typing import Dict
 
 
 class Metric(ABC):

@@ -1,7 +1,20 @@
-import pytest
+import pickle
+from pathlib import Path
 
-from icevision.all import *
-from icevision.metrics.confusion_matrix.confusion_matrix_utils import *
+import numpy as np
+import pytest
+import torch
+
+from icevision.core.bbox import BBox
+from icevision.core.class_map import ClassMap
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import SizeRecordComponent, FilepathRecordComponent, \
+    InstancesLabelsRecordComponent, BBoxesRecordComponent, ScoresRecordComponent
+from icevision.data.prediction import Prediction
+from icevision.metrics.confusion_matrix import SimpleConfusionMatrix
+from icevision.metrics.confusion_matrix.confusion_matrix_utils import pairwise_iou_record_record, \
+    match_predictions_to_targets, match_targets_to_predictions
+from icevision.utils.imageio import ImgSize
 
 
 def record_template():

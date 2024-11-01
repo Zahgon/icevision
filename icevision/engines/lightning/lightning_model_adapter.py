@@ -1,11 +1,14 @@
 __all__ = ["LightningModelAdapter"]
 
-import pytorch_lightning as pl
-from icevision.imports import *
-from icevision.metrics import *
+from abc import ABC
+from typing import List
+
+import lightning as L
+
+from icevision.metrics import Metric
 
 
-class LightningModelAdapter(pl.LightningModule, ABC):
+class LightningModelAdapter(L.LightningModule, ABC):
     def __init__(
         self,
         metrics: List[Metric] = None,

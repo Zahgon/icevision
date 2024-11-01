@@ -1,9 +1,11 @@
 __all__ = ["COCOMetric", "COCOMetricType"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.data import *
-from icevision.metrics.metric import *
+from enum import Enum
+from typing import Optional, Sequence, Dict
+
+from icevision.data.convert_records_to_coco_style import create_coco_eval
+from icevision.metrics.metric import Metric
+from icevision.utils.capture_stdout import CaptureStdout
 
 
 class COCOMetricType(Enum):
