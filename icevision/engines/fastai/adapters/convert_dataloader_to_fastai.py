@@ -3,17 +3,18 @@ __all__ = [
     "convert_dataloaders_to_fastai",
 ]
 
-from icevision.imports import *
-from icevision.engines.fastai.imports import *
+from typing import List, Union
+from fastai.data import core as fastai_core
+
 from torch.utils.data import SequentialSampler, RandomSampler
-from torch.utils.data.dataloader import _InfiniteConstantSampler
+from torch.utils.data.dataloader import _InfiniteConstantSampler, DataLoader
 
 
 def convert_dataloader_to_fastai(dataloader: DataLoader):
     def raise_error_convert(data):
         raise NotImplementedError
 
-    class FastaiDataLoaderWithCollate(fastai.DataLoader):
+    class FastaiDataLoaderWithCollate(fastai_core.DataLoader):
         def create_batch(self, b):
             return (dataloader.collate_fn, raise_error_convert)[self.prebatched](b)
 
@@ -39,19 +40,19 @@ def convert_dataloader_to_fastai(dataloader: DataLoader):
 
 
 def convert_dataloaders_to_fastai(
-    dls: List[Union[DataLoader, fastai.DataLoader]], device=None
+    dls: List[Union[DataLoader, fastai_core.DataLoader]], device=None
 ):
     fastai_dls = []
     for dl in dls:
         if isinstance(dl, DataLoader):
             fastai_dl = convert_dataloader_to_fastai(dl)
-        elif isinstance(dl, fastai.DataLoader):
+        elif isinstance(dl, fastai_core.DataLoader):
             fastai_dl = dl
         else:
             raise ValueError(f"dl type {type(dl)} not supported")
 
         fastai_dls.append(fastai_dl)
 
-    device = device or fastai.default_device()
-    fastai_dls = fastai.DataLoaders(*fastai_dls).to(device)
+    device = device or fastai_core.default_device()
+    fastai_dls = fastai_core.DataLoaders(*fastai_dls).to(device)
     return fastai_dls

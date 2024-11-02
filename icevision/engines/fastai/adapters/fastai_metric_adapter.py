@@ -1,18 +1,19 @@
 __all__ = ["FastaiMetricAdapter"]
 
-from icevision.imports import *
+from typing import Dict
+
+from fastai import metrics as fastai_metrics
 from icevision.metrics import Metric
-from icevision.engines.fastai.imports import *
 
 
-class FastaiMetricAdapter(fastai.Metric):
+class FastaiMetricAdapter(fastai_metrics.Metric):
     def __init__(self, metric: Metric):
         self.metric = metric
 
     def reset(self):
         pass
 
-    def accumulate(self, learn: fastai.Learner):
+    def accumulate(self, learn: fastai_metrics.Learner):
         self.metric.accumulate(preds=learn.converted_preds)
 
     @property

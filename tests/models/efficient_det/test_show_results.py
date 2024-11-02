@@ -1,4 +1,5 @@
-from icevision.all import *
+from matplotlib import pyplot as plt
+
 from icevision.models.ross import efficientdet
 
 

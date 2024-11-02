@@ -1,7 +1,7 @@
 __all__ = ["EfficientDetCallback"]
 
 from icevision.models.ross import efficientdet
-from icevision.engines.fastai import *
+from icevision.engines import fastai
 
 
 class EfficientDetCallback(fastai.Callback):

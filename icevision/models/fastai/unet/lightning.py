@@ -1,9 +1,12 @@
 __all__ = ["ModelAdapter"]
 
-from icevision.imports import *
-from icevision.metrics import *
+from abc import ABC
+from typing import List
+
 from icevision.engines.lightning.lightning_model_adapter import LightningModelAdapter
-from torch.nn import CrossEntropyLoss
+from torch import nn
+
+from icevision.metrics import Metric
 from icevision.models.fastai import unet
 
 
@@ -24,7 +27,7 @@ class ModelAdapter(LightningModelAdapter, ABC):
     def __init__(self, model: nn.Module, metrics: List[Metric] = None):
         super().__init__(metrics=metrics)
         self.model = model
-        self.loss_func = CrossEntropyLoss()
+        self.loss_func = nn.CrossEntropyLoss()
 
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)

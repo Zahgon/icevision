@@ -1,6 +1,12 @@
 import pytest
 import random
-from icevision.all import *
+
+import torch
+from torch.optim import SGD
+import lightning.pytorch as L
+
+from icevision import models
+from icevision.metrics.coco_metric.coco_metric import COCOMetric
 
 
 @pytest.fixture
@@ -29,7 +35,7 @@ def test_lightining_efficientdet_train(
 ):
     train_dl, valid_dl = fridge_efficientdet_dls
     light_model = light_model_cls(model=fridge_efficientdet_model, metrics=metrics)
-    trainer = pl.Trainer(
+    trainer = L.Trainer(
         max_epochs=1,
         enable_model_summary=False,
         num_sanity_val_steps=0,

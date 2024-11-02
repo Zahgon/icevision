@@ -18,12 +18,10 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Image Recognition",
 ]
 dependencies = [
-    "torch==1.13.1",
-    "torchvision==0.14.1",
     "loguru",
     "albumentations>=1.0.3,<1.1",
     "tqdm",
-    "fastcore>=1.3.8,<1.5",
+    "fastcore>=1.5",
     "numpy<2",
     "rasterio>=1.3a1,<2",
     "matplotlib>=3.2.2,<4",
@@ -31,6 +29,9 @@ dependencies = [
     "lightning>=2.2.5",
     "scikit-learn>=1.5.2",
     "effdet>=0.4.1",
+    "torch>=2.5.1",
+    "torchvision>=0.20.1",
+    "fastai>=2.7.10,<2.8",
 ]
 
 

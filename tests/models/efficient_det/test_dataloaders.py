@@ -1,5 +1,16 @@
+import numpy as np
 import pytest
-from icevision.all import *
+import torch
+
+from fastcore.utils import first
+from torchvision.transforms.functional import to_tensor
+
+from icevision import tfms
+from icevision.core.bbox import BBox
+from icevision.core.class_map import ClassMap
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import ImageRecordComponent, InstancesLabelsRecordComponent, BBoxesRecordComponent
+from icevision.data.dataset import Dataset
 from icevision.models.ross import efficientdet
 
 
@@ -44,11 +55,11 @@ def _test_batch(images, targets):
 
     assert targets["cls"][0].dtype == torch.float
     assert len(targets["cls"]) == 2
-    assert torch.all(targets["cls"][0] == tensor([1, 2], dtype=torch.float))
+    assert torch.all(targets["cls"][0] == torch.tensor([1, 2], dtype=torch.float))
 
     assert targets["bbox"][0].dtype == torch.float
     assert len(targets["bbox"]) == 2
-    expected_bboxes = tensor([[2, 1, 4, 3], [20, 10, 40, 30]], dtype=torch.float)
+    expected_bboxes = torch.tensor([[2, 1, 4, 3], [20, 10, 40, 30]], dtype=torch.float)
     assert torch.all(targets["bbox"][0] == expected_bboxes)
 
 
@@ -94,8 +105,8 @@ def test_efficient_det_build_infer_batch(records, img):
     batch, records = efficientdet.build_infer_batch(records)
 
     tensor_img = torch.stack([to_tensor(img), to_tensor(img)])
-    img_sizes = tensor([(4, 4), (4, 4)], dtype=torch.float)
-    img_scales = tensor([1, 1], dtype=torch.float)
+    img_sizes = torch.tensor([(4, 4), (4, 4)], dtype=torch.float)
+    img_scales = torch.tensor([1, 1], dtype=torch.float)
     img_info = {"img_size": img_sizes, "img_scale": img_scales}
 
     batch_imgs, batch_info = batch
@@ -117,8 +128,8 @@ def test_efficient_det_infer_dl(records, batch_tfms, img):
     )
 
     tensor_img = torch.stack([to_tensor(img), to_tensor(img)])
-    img_sizes = tensor([(4, 4), (4, 4)], dtype=torch.float)
-    img_scales = tensor([1, 1], dtype=torch.float)
+    img_sizes = torch.tensor([(4, 4), (4, 4)], dtype=torch.float)
+    img_scales = torch.tensor([1, 1], dtype=torch.float)
     img_info = {"img_size": img_sizes, "img_scale": img_scales}
 
     batch_imgs, batch_info = batch

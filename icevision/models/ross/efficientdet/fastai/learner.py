@@ -1,7 +1,13 @@
 __all__ = ["learner"]
 
-from icevision.imports import *
-from icevision.engines.fastai import *
+from typing import List, Union
+
+from torch import nn
+from torch.utils.data import DataLoader
+from fastcore.utils import L, first
+
+from icevision.engines import fastai
+from icevision.engines.fastai.learner import adapted_fastai_learner
 from icevision.models.ross.efficientdet.loss_fn import loss_fn
 from icevision.models.ross.efficientdet.fastai.callbacks import EfficientDetCallback
 

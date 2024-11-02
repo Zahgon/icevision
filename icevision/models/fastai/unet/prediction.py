@@ -1,11 +1,20 @@
 __all__ = ["predict", "predict_from_dl", "convert_raw_predictions"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.data import *
+from typing import Sequence, Optional, List
+
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+
+from icevision.core import tasks
+from icevision.core.mask import MaskArray
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import ImageRecordComponent, SemanticMaskRecordComponent, ClassMapRecordComponent
+from icevision.data.dataset import Dataset
+from icevision.data.prediction import Prediction
+from icevision.models.fastai.unet import build_infer_batch
 from icevision.models.utils import _predict_from_dl
-from icevision.models.fastai.unet.dataloaders import *
+from icevision.utils.torch_utils import model_device, tensor_to_image
 
 
 @torch.no_grad()

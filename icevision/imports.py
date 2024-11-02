@@ -1,3 +1,5 @@
+raise NotImplementedError
+
 import torch
 from torch import nn
 from typing import Union, List, Tuple, Dict, Optional, Any, Hashable

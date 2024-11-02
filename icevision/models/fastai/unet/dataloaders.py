@@ -1,9 +1,13 @@
 __all__ = ["train_dl", "valid_dl", "infer_dl", "build_train_batch", "build_infer_batch"]
 
+from typing import Sequence
 
-from icevision.imports import *
-from icevision.core import *
-from icevision.models.utils import *
+from torch.utils.data import DataLoader
+import torch
+from torchvision.transforms.functional import to_tensor
+
+from icevision.core.record import BaseRecord
+from icevision.models.utils import transform_dl
 
 
 def train_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
@@ -56,7 +60,7 @@ def build_train_batch(records: Sequence[BaseRecord]):
         # can be optimzed to be converted to tensor once at the end
         tensor_images.append(to_tensor(record.img))
         tensor_masks.append(
-            tensor(record.segmentation.mask_array.data).long().squeeze()
+            torch.tensor(record.segmentation.mask_array.data).long().squeeze()
         )
 
     tensor_images = torch.stack(tensor_images)

@@ -1,19 +1,22 @@
 __all__ = ["show_results", "interp"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.data import *
-from icevision.models.fastai.unet.prediction import *
+from typing import Optional
+
+import torch
+from torch import nn
+
+from icevision.core.mask import MaskArray
+from icevision.data.dataset import Dataset
+from icevision.models.fastai.unet.prediction import predict_from_dl, predict
 from icevision.models.base_show_results import *
 from icevision.models.fastai.unet.dataloaders import (
     valid_dl,
     infer_dl,
 )
-from icevision.models.interpretation import Interpretation
-
-from icevision.models.interpretation import _move_to_device
+from icevision.models.interpretation import Interpretation, _move_to_device
 from icevision.core.record_components import LossesRecordComponent
+from icevision.utils.torch_utils import tensor_to_image
+from icevision.utils.utils import denormalize_imagenet, pbar
 
 
 def show_results(

@@ -1,6 +1,9 @@
 import pytest
-from icevision.all import *
+
+from icevision.metrics.coco_metric.coco_metric import COCOMetric
+from icevision.metrics.confusion_matrix.confusion_matrix import SimpleConfusionMatrix
 from icevision.models.ross import efficientdet
+from icevision.utils.capture_stdout import CaptureStdout
 
 
 @pytest.fixture

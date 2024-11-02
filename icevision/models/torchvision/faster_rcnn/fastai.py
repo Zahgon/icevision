@@ -1,9 +1,16 @@
 __all__ = ["FasterRCNNCallback", "learner"]
-from icevision.imports import *
-from icevision.engines.fastai import *
+
+from typing import Sequence, Union, Optional
+from torch.utils.data import DataLoader
+from torch import nn
+
+from fastai.data import core as fastai_core
+from icevision.engines import fastai
+from fastcore.utils import L
+
 from icevision.models.torchvision.fastai_learner import rcnn_learner
-from icevision.models.torchvision.fastai_callbacks import *
-from icevision.models.torchvision.faster_rcnn.prediction import *
+from icevision.models.torchvision.fastai_callbacks import RCNNCallback
+from icevision.models.torchvision.faster_rcnn import convert_raw_predictions
 
 
 class FasterRCNNCallback(RCNNCallback):

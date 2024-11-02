@@ -1,9 +1,13 @@
-__all__ = ["RCNNCallback", "rcnn_learner"]
+from typing import Union, List
 
-from icevision.imports import *
-from icevision.engines.fastai import *
+from fastai.data import core as fastai_core
+from fastcore.utils import first
+from torch.utils.data import DataLoader
+from torch import nn
+
+from icevision.engines.fastai.learner.adapted_fastai_learner import adapted_fastai_learner
 from icevision.models.torchvision.loss_fn import loss_fn
-from icevision.models.torchvision.fastai_callbacks import *
+
 
 
 def noop_watch(models, criterion=None, log="gradients", log_freq=1000, idx=None):
@@ -11,7 +15,7 @@ def noop_watch(models, criterion=None, log="gradients", log_freq=1000, idx=None)
 
 
 def rcnn_learner(
-    dls: List[Union[DataLoader, fastai.DataLoader]],
+    dls: List[Union[DataLoader, fastai_core.DataLoader]],
     model: nn.Module,
     cbs=None,
     **kwargs,
@@ -25,7 +29,7 @@ def rcnn_learner(
     )
 
     # HACK: patch AvgLoss (in original, find_bs gives errors)
-    class RCNNAvgLoss(fastai.AvgLoss):
+    class RCNNAvgLoss(fastai_core.AvgLoss):
         def accumulate(self, learn):
             bs = len(first(learn.yb))
             self.total += fastai.to_detach(learn.loss.mean()) * bs

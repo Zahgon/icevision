@@ -1,8 +1,8 @@
 __all__ = ["RCNNCallback"]
 
-from icevision.imports import *
-from icevision.engines.fastai import *
+from abc import ABC, abstractmethod
 
+from icevision.engines import fastai
 
 class RCNNCallback(fastai.Callback, ABC):
     @abstractmethod

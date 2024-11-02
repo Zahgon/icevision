@@ -1,8 +1,8 @@
 __all__ = ["model"]
 
-from icevision.imports import *
 from icevision.models.torchvision.backbone_config import BackboneConfig
 from icevision.models.torchvision.utils import patch_param_groups
+import fastai.vision.models
 
 
 # TODO: img_size and visualization
@@ -10,7 +10,7 @@ from icevision.models.torchvision.utils import patch_param_groups
 def model(backbone: BackboneConfig, num_classes: int, img_size, channels_in=3):
     img_size = (img_size, img_size) if isinstance(img_size, int) else img_size[::-1]
 
-    model = fastai.models.unet.DynamicUnet(backbone.backbone, num_classes, img_size)
+    model = fastai.vision.models.unet.DynamicUnet(backbone.backbone, num_classes, img_size)
     patch_param_groups(
         model=model,
         head_layers=[model[1:]],

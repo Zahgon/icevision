@@ -1,26 +1,8 @@
 import pytest
-from icevision.all import *
+import torch
+import lightning.pytorch as L
 
-
-@pytest.fixture
-def light_model_cls():
-    class LightModel(models.ross.efficientdet.lightning.ModelAdapter):
-        def __init__(self, model, metrics):
-            super(LightModel, self).__init__(model, metrics)
-            self.was_finalize_metrics_called = False
-            self.logs = {}
-
-        def configure_optimizers(self):
-            return SGD(self.parameters(), lr=1e-3)
-
-        def finalize_metrics(self):
-            self.was_finalize_metrics_called = True
-
-        def log(self, key, value, **args):
-            super(LightModel, self).log(key, value, **args)
-            self.logs[key] = value
-
-    return LightModel
+from icevision.metrics.coco_metric.coco_metric import COCOMetric
 
 
 # WARNING: Only works with cuda: https://github.com/rwightman/efficientdet-pytorch/issues/44#issuecomment-662594014
@@ -31,7 +13,7 @@ def test_lightining_efficientdet_test(
 ):
     _, valid_dl = fridge_efficientdet_dls
     light_model = light_model_cls(fridge_efficientdet_model, metrics=metrics)
-    trainer = pl.Trainer(
+    trainer = L.Trainer(
         max_epochs=1,
         enable_model_summary=False,
         num_sanity_val_steps=0,
@@ -49,7 +31,7 @@ def test_lightining_efficientdet_finalizes_metrics_on_test_epoch_end(
     with torch.set_grad_enabled(False):
         light_model = light_model_cls(fridge_efficientdet_model, metrics=metrics)
 
-        light_model.test_epoch_end(None)
+        light_model.on_test_epoch_end()
 
         assert light_model.was_finalize_metrics_called == True
 

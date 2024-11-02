@@ -1,8 +1,14 @@
 __all__ = ["learner", "UnetCallback"]
 
+from typing import List, Union
 
-from icevision.imports import *
-from icevision.engines.fastai import *
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+from fastcore.utils import L
+
+from icevision.engines import fastai
+from icevision.engines.fastai import adapted_fastai_learner
 from icevision.models.fastai.unet.prediction import convert_raw_predictions
 
 

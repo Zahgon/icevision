@@ -1,8 +1,11 @@
-import pytest
-from icevision.all import *
-import albumentations as A
+import numpy as np
+
+from icevision.core.bbox import BBox
+from icevision.data.dataset import Dataset
 from icevision.models.inference import postprocess_bbox
 from icevision.models.ross import efficientdet
+from icevision import tfms
+from icevision.utils.imageio import open_img, get_img_size
 
 
 def test_e2e_detect(samples_source, fridge_efficientdet_model, fridge_class_map):

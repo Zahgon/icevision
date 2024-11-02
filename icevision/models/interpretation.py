@@ -12,8 +12,10 @@ from typing import List, Union, Tuple
 import numpy as np
 import torch
 from torch import nn
+from loguru import logger
 
 from icevision.data.dataset import Dataset
+from icevision.data.prediction import Prediction
 from icevision.utils.torch_utils import tensor_to_image, model_device
 from icevision.utils.utils import pbar
 from icevision.visualize.show_data import show_preds

@@ -18,7 +18,7 @@ from icevision.core.record_components import RecordIDRecordComponent, ClassMapRe
 from icevision.data.data_splitter import SingleSplitSplitter, RandomSplitter
 from icevision.data.dataset import Dataset
 from icevision.data.record_collection import RecordCollection
-from icevision import parsers, tfms
+from icevision import parsers, tfms, models
 
 
 @pytest.fixture(scope="session")
@@ -36,7 +36,7 @@ def fridge_efficientdet_model() -> nn.Module:
     WEIGHTS_URL = "https://github.com/potipot/icevision/releases/download/0.13.0/fridge_tf_efficientdet_lite0.pt"
     # TODO: HACK 5+1 in num_classes (becaues of change in model.py)
     backbone = models.ross.efficientdet.backbones.tf_lite0(pretrained=False)
-    model = efficientdet.model(backbone=backbone, num_classes=5, img_size=384)
+    model = models.efficientdet.model(backbone=backbone, num_classes=5, img_size=384)
 
     state_dict = torch.hub.load_state_dict_from_url(
         WEIGHTS_URL, map_location=torch.device("cpu")
@@ -124,8 +124,8 @@ def fridge_ds(samples_source, fridge_class_map) -> Tuple[Dataset, Dataset]:
 @pytest.fixture(params=[2, 3])
 def fridge_efficientdet_dls(fridge_ds, request) -> Tuple[DataLoader, DataLoader]:
     train_ds, valid_ds = fridge_ds
-    train_dl = efficientdet.train_dl(train_ds, batch_size=request.param)
-    valid_dl = efficientdet.valid_dl(valid_ds, batch_size=request.param)
+    train_dl = models.efficientdet.train_dl(train_ds, batch_size=request.param)
+    valid_dl = models.efficientdet.valid_dl(valid_ds, batch_size=request.param)
 
     return train_dl, valid_dl
 

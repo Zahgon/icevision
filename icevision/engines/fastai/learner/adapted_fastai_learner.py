@@ -1,21 +1,25 @@
 __all__ = ["adapted_fastai_learner"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.metrics import *
-from icevision.engines.fastai.imports import *
-from icevision.engines.fastai.adapters import *
+from typing import List, Union
+from torch.utils.data import DataLoader
+from torch import nn
+from fastai.data import core as fastai_core
+from fastai.learner import Learner
+
+
+from icevision.engines.fastai import convert_dataloaders_to_fastai, FastaiMetricAdapter
+from icevision.metrics import Metric
 
 
 # TODO: param_groups fix for efficientdet
 def adapted_fastai_learner(
-    dls: List[Union[DataLoader, fastai.DataLoader]],
+    dls: List[Union[DataLoader, fastai_core.DataLoader]],
     model: nn.Module,
     metrics=None,
     device=None,
     splitter=None,
     **learner_kwargs,
-) -> fastai.Learner:
+) -> Learner:
     # convert dataloaders to fastai
     fastai_dls = convert_dataloaders_to_fastai(dls=dls, device=device)
 
@@ -38,7 +42,7 @@ def adapted_fastai_learner(
                 "the model should define a method called `param_groups`"
             )
 
-    learn = fastai.Learner(
+    learn = Learner(
         dls=fastai_dls,
         model=model,
         metrics=fastai_metrics,
