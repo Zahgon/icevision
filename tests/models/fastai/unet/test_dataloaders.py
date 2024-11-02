@@ -1,4 +1,6 @@
-from icevision.all import *
+import torch
+from fastcore.utils import first
+from icevision import models
 
 
 def _test_dl(x, y, recs):

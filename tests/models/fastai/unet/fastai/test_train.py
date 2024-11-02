@@ -1,5 +1,6 @@
 import pytest
-from icevision.all import *
+
+from icevision import models
 from icevision.models.fastai.unet.backbones import *
 
 

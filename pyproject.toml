@@ -32,6 +32,7 @@ dependencies = [
     "torch>=2.5.1",
     "torchvision>=0.20.1",
     "fastai>=2.7.10,<2.8",
+    "wandb>=0.18.5",
 ]
 
 

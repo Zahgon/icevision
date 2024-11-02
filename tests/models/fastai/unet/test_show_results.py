@@ -1,6 +1,9 @@
 import pytest
-from icevision.all import *
+
+from matplotlib import pyplot as plt
+
 from icevision.models.fastai.unet.backbones import *
+from icevision import models
 from icevision.models.interpretation import get_samples_losses
 
 

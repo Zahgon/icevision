@@ -13,12 +13,17 @@ from torch.utils.data import DataLoader
 from icevision.core.class_map import ClassMap
 from icevision.core.id_map import IDMap
 from icevision.core.keypoints import KeypointsMetadata
+from icevision.core.mask import SemanticMaskFile
 from icevision.core.record_components import RecordIDRecordComponent, ClassMapRecordComponent, FilepathRecordComponent, ImageRecordComponent, SizeRecordComponent, InstancesLabelsRecordComponent, BBoxesRecordComponent, \
     InstanceMasksRecordComponent, KeyPointsRecordComponent, AreasRecordComponent, IsCrowdsRecordComponent
+from icevision.core.record_defaults import SemanticSegmentationRecord
 from icevision.data.data_splitter import SingleSplitSplitter, RandomSplitter
 from icevision.data.dataset import Dataset
 from icevision.data.record_collection import RecordCollection
 from icevision import parsers, tfms, models
+from icevision.utils.get_files import get_image_files
+from icevision.utils.imageio import get_img_size
+from icevision.utils.utils import pbar
 
 
 @pytest.fixture(scope="session")

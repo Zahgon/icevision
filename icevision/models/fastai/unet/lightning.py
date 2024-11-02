@@ -71,11 +71,11 @@ class ModelAdapter(LightningModelAdapter, ABC):
             records=records,
         )
 
-    def validation_epoch_end(self, outs):
+    def on_validation_epoch_end(self):
         self.finalize_metrics()
 
     def test_step(self, batch, batch_idx):
         self._shared_eval(batch=batch, loss_log_key="test")
 
-    def test_epoch_end(self, outs):
+    def on_test_epoch_end(self):
         self.finalize_metrics()

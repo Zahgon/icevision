@@ -1,5 +1,7 @@
 import pytest
-from icevision.all import *
+
+from icevision import models
+from icevision.core.mask import MaskArray
 from icevision.models.fastai.unet.backbones import *
 
 

@@ -1,6 +1,5 @@
 import pytest
-from icevision.all import *
-from icevision.models.fastai import unet
+from icevision import models
 
 
 @pytest.mark.parametrize(
@@ -15,7 +14,7 @@ def test_unet_fpn_backbones_large(model_name, param_groups_len):
     backbone_fn = getattr(models.fastai.unet.backbones, model_name)
     backbone = backbone_fn(pretrained=False)
 
-    model = unet.model(img_size=64, num_classes=4, backbone=backbone)
+    model = models.fastai.unet.model(img_size=64, num_classes=4, backbone=backbone)
     assert len(list(model.param_groups())) == param_groups_len
 
 
@@ -30,7 +29,7 @@ def test_unet_fpn_backbones_medium(model_name, param_groups_len):
     backbone_fn = getattr(models.fastai.unet.backbones, model_name)
     backbone = backbone_fn(pretrained=False)
 
-    model = unet.model(img_size=64, num_classes=4, backbone=backbone)
+    model = models.fastai.unet.model(img_size=64, num_classes=4, backbone=backbone)
     assert len(list(model.param_groups())) == param_groups_len
 
 
@@ -45,5 +44,5 @@ def test_unet_fpn_backbones_small(model_name, param_groups_len):
     backbone_fn = getattr(models.fastai.unet.backbones, model_name)
     backbone = backbone_fn(pretrained=False)
 
-    model = unet.model(img_size=64, num_classes=4, backbone=backbone)
+    model = models.fastai.unet.model(img_size=64, num_classes=4, backbone=backbone)
     assert len(list(model.param_groups())) == param_groups_len

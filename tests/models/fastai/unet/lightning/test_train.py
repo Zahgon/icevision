@@ -1,6 +1,13 @@
+import random
+
 import pytest
-from icevision.all import *
+import torch
+import lightning.pytorch as L
+from torch.optim import Adam
+
 from icevision.models.fastai.unet.backbones import *
+from icevision import models
+
 
 
 @pytest.mark.parametrize("backbone", [resnet18])
@@ -22,7 +29,7 @@ def test_fastai_unet_train(camvid_ds, backbone):
 
     light_model = LightModel(model)
 
-    trainer = pl.Trainer(
+    trainer = L.Trainer(
         max_epochs=1,
         enable_model_summary=False,
         num_sanity_val_steps=0,
