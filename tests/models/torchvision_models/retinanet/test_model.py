@@ -1,4 +1,3 @@
-from icevision.all import *
 from icevision.models.torchvision import retinanet
 
 

@@ -1,5 +1,9 @@
 import pytest
-from icevision.all import *
+from matplotlib import pyplot as plt
+from torch import nn, tensor
+
+from icevision import models
+from icevision.models.interpretation import add_annotations, get_samples_losses
 from icevision.models.torchvision import faster_rcnn
 
 
@@ -74,7 +78,7 @@ def test_add_annotations(fridge_faster_rcnn_model, fridge_ds):
     ds, _ = fridge_ds
 
     samples, _ = faster_rcnn.interp.get_losses(model, ds)
-    samples = models.add_annotations(samples)
+    samples = add_annotations(samples)
     assert "loss_classifier" in samples[0].losses["text"]
     assert "IMG" in samples[0].losses["text"]
 
@@ -87,5 +91,5 @@ def test_get_samples_losses(fridge_faster_rcnn_model, fridge_ds, monkeypatch):
     samples_plus_losses, _, _ = faster_rcnn.interp.plot_top_losses(
         model=model, dataset=ds, n_samples=2
     )
-    loss_per_image = models.get_samples_losses(samples_plus_losses)
+    loss_per_image = get_samples_losses(samples_plus_losses)
     assert "filepath" in loss_per_image[0].keys()

@@ -10,9 +10,7 @@ __all__ = [
     "wide_resnet101_2_fpn",
 ]
 
-from icevision.models.torchvision.keypoint_rcnn.backbones.resnet_fpn_utils import (
-    patch_param_groups,
-)
+from icevision.models.torchvision.keypoint_rcnn.backbones.resnet_fpn_utils import patch_param_groups
 from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from icevision.models.torchvision.keypoint_rcnn.backbones.backbone_config import (
     TorchvisionKeypointRCNNBackboneConfig,

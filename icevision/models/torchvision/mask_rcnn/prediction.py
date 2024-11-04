@@ -5,15 +5,24 @@ __all__ = [
     "convert_raw_predictions",
 ]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.data import *
+from typing import List, Sequence, Optional
+
+import numpy as np
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+
+from icevision.core.mask import MaskArray
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import InstanceMasksRecordComponent
+from icevision.data.dataset import Dataset
+from icevision.data.prediction import Prediction
+from icevision.models.torchvision.dataloaders import build_infer_batch
 from icevision.models.utils import _predict_from_dl
-from icevision.models.torchvision.mask_rcnn.dataloaders import *
 from icevision.models.torchvision.faster_rcnn.prediction import (
     convert_raw_prediction as faster_convert_raw_prediction,
 )
+from icevision.utils.torch_utils import model_device
 
 
 @torch.no_grad()

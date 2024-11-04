@@ -1,5 +1,9 @@
 import pytest
-from icevision.all import *
+import torch
+from torch.optim import SGD
+import lightning.pytorch as L
+
+from icevision.metrics import COCOMetric
 from icevision.models.torchvision import faster_rcnn
 
 
@@ -30,7 +34,7 @@ def test_lightining_faster_rcnn_test(
 ):
     _, valid_dl = fridge_faster_rcnn_dls
     light_model = light_model_cls(fridge_faster_rcnn_model, metrics=metrics)
-    trainer = pl.Trainer(
+    trainer = L.Trainer(
         max_epochs=1,
         enable_model_summary=False,
         num_sanity_val_steps=0,
@@ -48,7 +52,7 @@ def test_lightining_faster_rcnn_finalizes_metrics_on_test_epoch_end(
     with torch.set_grad_enabled(False):
         light_model = light_model_cls(fridge_faster_rcnn_model, metrics=metrics)
 
-        light_model.test_epoch_end(None)
+        light_model.on_test_epoch_end()
 
         assert light_model.was_finalize_metrics_called == True
 

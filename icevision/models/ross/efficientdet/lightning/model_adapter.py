@@ -13,7 +13,7 @@ from icevision.models.ross import efficientdet
 class ModelAdapter(LightningModelAdapter, ABC):
     """Lightning module specialized for EfficientDet, with metrics support.
 
-    The methods `forward`, `training_step`, `validation_step`, `validation_epoch_end`
+    The methods `forward`, `training_step`, `validation_step`, `on_validation_epoch_end`
     are already overriden.
 
     # Arguments

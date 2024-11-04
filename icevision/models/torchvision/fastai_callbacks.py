@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 from icevision.engines import fastai
 
+
 class RCNNCallback(fastai.Callback, ABC):
     @abstractmethod
     def convert_raw_predictions(self, raw_preds):

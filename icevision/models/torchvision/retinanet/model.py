@@ -1,7 +1,8 @@
 __all__ = ["model"]
 
-from icevision.imports import *
-from icevision.models.torchvision.utils import *
+from typing import Optional
+from torch import nn
+
 from icevision.models.torchvision.retinanet.backbones import (
     resnet_fpn_configs as resnet_fpn,
 )
@@ -12,6 +13,8 @@ from torchvision.models.detection.retinanet import (
     RetinaNet,
     RetinaNetHead,
 )
+
+from icevision.models.torchvision.utils import patch_retinanet_param_groups, remove_internal_model_transforms
 
 
 def model(

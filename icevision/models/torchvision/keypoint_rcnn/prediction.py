@@ -6,15 +6,21 @@ __all__ = [
 ]
 
 from itertools import chain
-from icevision.imports import *
-from icevision.core import *
-from icevision.utils import *
-from icevision.data import *
+from typing import Sequence, Optional, List
+
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+
+from icevision.core.keypoints import KeyPoints
+from icevision.core.record import BaseRecord
+from icevision.core.record_components import KeyPointsRecordComponent
+from icevision.data.dataset import Dataset
+from icevision.data.prediction import Prediction
 from icevision.models.utils import _predict_from_dl
-from icevision.models.torchvision.keypoint_rcnn.dataloaders import *
-from icevision.models.torchvision.faster_rcnn.prediction import (
-    convert_raw_prediction as faster_convert_raw_prediction,
-)
+from icevision.models.torchvision.keypoint_rcnn.dataloaders import build_infer_batch
+from icevision.models.torchvision.faster_rcnn.prediction import convert_raw_prediction as faster_convert_raw_prediction
+from icevision.utils.torch_utils import model_device
 
 
 @torch.no_grad()

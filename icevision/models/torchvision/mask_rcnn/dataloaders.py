@@ -7,14 +7,19 @@ __all__ = [
     "build_infer_batch",
 ]
 
-from icevision.imports import *
-from icevision.core import *
-from icevision.models.utils import *
+from typing import List, Tuple, Dict
+
+import torch
+from torch.utils.data import DataLoader
+from torch import tensor
+
+from icevision.core.record_type import RecordType
 from icevision.models.torchvision.dataloaders import _build_train_sample
 from icevision.models.torchvision.dataloaders import (
     build_infer_batch,
     infer_dl,
 )
+from icevision.models.utils import transform_dl
 
 
 def train_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:

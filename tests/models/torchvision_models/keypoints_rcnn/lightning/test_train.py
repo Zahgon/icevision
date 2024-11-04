@@ -1,5 +1,10 @@
+import random
+
 import pytest
-from icevision.all import *
+import lightning.pytorch as L
+import torch
+from torch.optim import SGD
+
 from icevision.models.torchvision import keypoint_rcnn
 
 
@@ -26,7 +31,7 @@ def test_lightining_keypoints_rcnn_train(ochuman_keypoints_dls, light_model_cls)
     model = keypoint_rcnn.model(num_keypoints=19)
     light_model = light_model_cls(model)
 
-    trainer = pl.Trainer(
+    trainer = L.Trainer(
         max_epochs=1,
         enable_model_summary=False,
         num_sanity_val_steps=0,

@@ -1,4 +1,4 @@
-from icevision.all import *
+from icevision import tfms, models
 from icevision.models.torchvision import faster_rcnn
 import albumentations as A
 import pytest

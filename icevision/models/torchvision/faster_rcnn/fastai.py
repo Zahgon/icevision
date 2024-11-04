@@ -4,7 +4,6 @@ from typing import Sequence, Union, Optional
 from torch.utils.data import DataLoader
 from torch import nn
 
-from fastai.data import core as fastai_core
 from icevision.engines import fastai
 from fastcore.utils import L
 

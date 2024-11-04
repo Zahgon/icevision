@@ -1,7 +1,14 @@
+import cv2
+import numpy as np
 import pytest
-from icevision.imports import *
-from icevision import *
+import torch
+
+from icevision.core.bbox import BBox
+from icevision.core.mask import MaskArray
+from icevision.data.dataset import Dataset
 from icevision.models.torchvision import mask_rcnn
+from icevision.utils.get_files import get_files
+from icevision.utils.imageio import open_img
 
 
 @pytest.fixture

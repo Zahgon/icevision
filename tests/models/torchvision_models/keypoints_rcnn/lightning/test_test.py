@@ -1,5 +1,8 @@
 import pytest
-from icevision.all import *
+import torch
+import lightning.pytorch as L
+from torch.optim import SGD
+
 from icevision.models.torchvision import keypoint_rcnn
 
 
@@ -28,7 +31,7 @@ def test_lightining_keypoints_rcnn_test(ochuman_keypoints_dls, light_model_cls):
     _, valid_dl = ochuman_keypoints_dls
     model = keypoint_rcnn.model(num_keypoints=19)
     light_model = light_model_cls(model)
-    trainer = pl.Trainer(
+    trainer = L.Trainer(
         max_epochs=1,
         enable_model_summary=False,
         num_sanity_val_steps=0,
@@ -44,7 +47,7 @@ def test_lightining_keypoints_finalizes_metrics_on_test_epoch_end(light_model_cl
         model = keypoint_rcnn.model(num_keypoints=19)
         light_model = light_model_cls(model)
 
-        light_model.test_epoch_end(None)
+        light_model.on_test_epoch_end()
 
         assert light_model.was_finalize_metrics_called == True
 

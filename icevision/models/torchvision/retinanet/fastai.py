@@ -1,10 +1,15 @@
 __all__ = ["learner", "RetinanetCallback"]
 
-from icevision.imports import *
-from icevision.engines.fastai import *
+from typing import List, Union
+
+from fastcore.utils import L
+from torch.utils.data import DataLoader
+from torch import nn
+
+from icevision.engines import fastai
 from icevision.models.torchvision.fastai_learner import rcnn_learner
-from icevision.models.torchvision.fastai_callbacks import *
-from icevision.models.torchvision.retinanet.prediction import *
+from icevision.models.torchvision.fastai_callbacks import RCNNCallback
+from icevision.models.torchvision.retinanet.prediction import convert_raw_predictions
 
 
 class RetinanetCallback(RCNNCallback):

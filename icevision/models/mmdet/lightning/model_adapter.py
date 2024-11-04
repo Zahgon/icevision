@@ -17,7 +17,7 @@ from icevision.models.mmdet.common.bbox import convert_raw_predictions
 class MMDetModelAdapter(LightningModelAdapter, ABC):
     """Lightning module specialized for MMDet, with metrics support.
 
-    The methods `forward`, `training_step`, `validation_step`, `validation_epoch_end`
+    The methods `forward`, `training_step`, `validation_step`, `on_validation_epoch_end`
     are already overriden.
 
     # Arguments

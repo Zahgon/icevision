@@ -1,4 +1,3 @@
-from icevision import *
 from icevision.models.torchvision import mask_rcnn
 
 

@@ -1,20 +1,16 @@
 __all__ = ["show_results", "interp"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.data import *
+from typing import Optional
+
+import torch
+from torch import nn
+
+from icevision.data.dataset import Dataset
 from icevision.models.base_show_results import base_show_results
 from icevision.models.interpretation import Interpretation
-from icevision.models.torchvision.dataloaders import (
-    valid_dl,
-    infer_dl,
-)
-
-from icevision.models.torchvision.retinanet.prediction import (
-    predict,
-    predict_from_dl,
-)
+from icevision.models.torchvision.dataloaders import valid_dl, infer_dl
+from icevision.models.torchvision.retinanet.prediction import predict, predict_from_dl
+from icevision.utils.utils import denormalize_imagenet
 
 
 def show_results(

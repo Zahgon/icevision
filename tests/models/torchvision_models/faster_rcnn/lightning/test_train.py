@@ -1,6 +1,10 @@
 import pytest
 import random
-from icevision.all import *
+
+import torch
+from torch.optim import Adam
+import lightning.pytorch as L
+from icevision.metrics import COCOMetric
 from icevision.models.torchvision import faster_rcnn
 
 
@@ -29,7 +33,7 @@ def test_lightining_faster_rcnn_train(
     train_dl, valid_dl = fridge_faster_rcnn_dls
     light_model = light_model_cls(fridge_faster_rcnn_model, metrics=metrics)
 
-    trainer = pl.Trainer(
+    trainer = L.Trainer(
         max_epochs=1,
         enable_model_summary=False,
         num_sanity_val_steps=0,

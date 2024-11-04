@@ -1,8 +1,8 @@
-from icevision.models.torchvision.loss_fn import *
+from icevision.models.torchvision.loss_fn import loss_fn
 
 from icevision.models.torchvision.retinanet import backbones
 from icevision.models.torchvision.dataloaders import *
-from icevision.models.torchvision.retinanet.model import *
+from icevision.models.torchvision.retinanet.model import model
 from icevision.models.torchvision.retinanet.prediction import *
 from icevision.models.torchvision.retinanet.show_results import *
 from icevision.models.torchvision.retinanet.show_batch import *

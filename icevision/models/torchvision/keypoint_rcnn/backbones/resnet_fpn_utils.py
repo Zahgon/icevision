@@ -3,8 +3,12 @@ __all__ = [
     "patch_param_groups",
 ]
 
-from icevision.imports import *
-from icevision.utils import *
+from types import MethodType
+from typing import List
+
+from torch import nn
+
+from icevision.utils.torch_utils import check_all_model_params_in_groups2
 
 
 def param_groups(model: nn.Module) -> List[nn.Parameter]:

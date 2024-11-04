@@ -1,4 +1,4 @@
-from icevision.all import *
+from icevision import models
 from icevision.models.torchvision import keypoint_rcnn
 
 

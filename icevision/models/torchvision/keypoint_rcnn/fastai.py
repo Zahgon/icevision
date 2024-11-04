@@ -1,10 +1,15 @@
 __all__ = ["learner", "KeypointRCNNCallback"]
 
-from icevision.imports import *
-from icevision.engines.fastai import *
+from typing import Union, List
+
+from fastcore.foundation import L
+from torch import nn
+from torch.utils.data import DataLoader
+
+from icevision.engines import fastai
 from icevision.models.torchvision.fastai_learner import rcnn_learner
-from icevision.models.torchvision.fastai_callbacks import *
-from icevision.models.torchvision.keypoint_rcnn.prediction import *
+from icevision.models.torchvision.fastai_callbacks import RCNNCallback
+from icevision.models.torchvision.keypoint_rcnn import convert_raw_predictions
 
 
 class KeypointRCNNCallback(RCNNCallback):

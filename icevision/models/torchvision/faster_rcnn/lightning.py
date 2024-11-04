@@ -7,7 +7,7 @@ from icevision.models.torchvision.lightning_model_adapter import RCNNModelAdapte
 class ModelAdapter(RCNNModelAdapter):
     """Lightning module specialized for faster_rcnn, with metrics support.
 
-    The methods `forward`, `training_step`, `validation_step`, `validation_epoch_end`
+    The methods `forward`, `training_step`, `validation_step`, `on_validation_epoch_end`
     are already overriden.
 
     # Arguments

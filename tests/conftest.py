@@ -1,6 +1,7 @@
+import json
 from copy import deepcopy
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, List, Hashable
 
 import pytest
 import torch
@@ -10,19 +11,22 @@ import numpy as np
 import albumentations as A
 from torch.utils.data import DataLoader
 
+from icevision.core.bbox import BBox
 from icevision.core.class_map import ClassMap
 from icevision.core.id_map import IDMap
-from icevision.core.keypoints import KeypointsMetadata
-from icevision.core.mask import SemanticMaskFile
+from icevision.core.keypoints import KeypointsMetadata, KeyPoints
+from icevision.core.mask import SemanticMaskFile, MaskArray
+from icevision.core.record import BaseRecord
 from icevision.core.record_components import RecordIDRecordComponent, ClassMapRecordComponent, FilepathRecordComponent, ImageRecordComponent, SizeRecordComponent, InstancesLabelsRecordComponent, BBoxesRecordComponent, \
     InstanceMasksRecordComponent, KeyPointsRecordComponent, AreasRecordComponent, IsCrowdsRecordComponent
-from icevision.core.record_defaults import SemanticSegmentationRecord
+from icevision.core.record_defaults import SemanticSegmentationRecord, ObjectDetectionRecord
 from icevision.data.data_splitter import SingleSplitSplitter, RandomSplitter
 from icevision.data.dataset import Dataset
 from icevision.data.record_collection import RecordCollection
 from icevision import parsers, tfms, models
+from icevision.models.torchvision import faster_rcnn, keypoint_rcnn
 from icevision.utils.get_files import get_image_files
-from icevision.utils.imageio import get_img_size
+from icevision.utils.imageio import get_img_size, ImgSize, open_img
 from icevision.utils.utils import pbar
 
 
@@ -339,7 +343,7 @@ class OCHumanKeypointsMetadata(KeypointsMetadata):
 
 @pytest.fixture(scope="module")
 def ochuman_ds(samples_source) -> Tuple[Dataset, Dataset]:
-    class OCHumanParser(Parser):
+    class OCHumanParser(parsers.Parser):
         def __init__(self, annotations_filepath, img_dir):
             self.annotations_dict = json.loads(Path(annotations_filepath).read_bytes())
             self.img_dir = Path(img_dir)
@@ -476,7 +480,7 @@ def instance_segmentation_record(object_detection_record):
 @pytest.fixture
 def gray_scale_instance_segmentation_record(gray_scale_object_detection_record):
     record = object_detection_record
-    record.add_component(MasksRecordComponent())
+    record.add_component(SemanticMaskRecordComponent())
 
     record.detection.add_masks([MaskArray(np.ones((2, 4, 4), dtype=np.uint8))])
 

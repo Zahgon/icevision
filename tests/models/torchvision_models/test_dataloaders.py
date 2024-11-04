@@ -1,5 +1,11 @@
 import pytest
-from icevision.all import *
+import torch
+from torch import tensor
+from fastcore.basics import first
+
+from icevision import tfms
+from icevision.data.data_splitter import SingleSplitSplitter
+from icevision.data.dataset import Dataset
 from icevision.models.torchvision import faster_rcnn, mask_rcnn, keypoint_rcnn
 
 

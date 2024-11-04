@@ -7,7 +7,7 @@ from icevision.models.torchvision.retinanet.prediction import *
 class ModelAdapter(RCNNModelAdapter):
     """Lightning module specialized for retinanet, with metrics support.
 
-    The methods `forward`, `training_step`, `validation_step`, `validation_epoch_end`
+    The methods `forward`, `training_step`, `validation_step`, `on_validation_epoch_end`
     are already overriden.
 
     # Arguments

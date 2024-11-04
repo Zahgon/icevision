@@ -1,5 +1,7 @@
 import pytest
-from icevision.all import *
+from matplotlib import pyplot as plt
+from torch import nn, tensor
+
 from icevision.models.torchvision import retinanet
 
 
