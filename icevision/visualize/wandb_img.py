@@ -9,7 +9,8 @@ __all__ = [
 from typing import List
 
 import wandb
-from icevision import BaseRecord, BBox
+
+from icevision.core.bbox import BBox
 from icevision.data.prediction import Prediction
 
 
