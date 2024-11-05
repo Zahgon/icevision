@@ -1,9 +1,16 @@
 __all__ = ["learner"]
 
-from icevision.imports import *
-from icevision.engines.fastai import *
+from typing import List, Union
+
+from fastcore.foundation import L
+from torch import nn, Tensor
+from torch.utils.data import DataLoader
+
+from icevision.engines import fastai
+from icevision.engines.fastai import adapted_fastai_learner
 from icevision.models.ultralytics.yolov5.fastai.callbacks import Yolov5Callback
-from yolov5.utils.loss import ComputeLoss
+from icevision.models.ultralytics.yolov5.loss_fn import loss_fn
+from icevision.utils.partial import partial
 
 
 def learner(
@@ -26,16 +33,14 @@ def learner(
     """
     cbs = [Yolov5Callback()] + L(cbs)
 
-    compute_loss = ComputeLoss(model)
-
-    def loss_fn(preds, targets) -> Tensor:
-        return compute_loss(preds, targets)[0]
+    def _loss_fn(preds, targets) -> Tensor:
+        return loss_fn(preds=preds, targets=targets, model=model)
 
     learn = adapted_fastai_learner(
         dls=dls,
         model=model,
         cbs=cbs,
-        loss_func=loss_fn,
+        loss_func=_loss_fn,
         **learner_kwargs,
     )
 

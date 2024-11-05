@@ -22,7 +22,7 @@ class _SoftDependencies:
         self.wandb = soft_import("wandb")
         self.resnest = soft_import("resnest")
         self.mmdet = soft_import("mmdet")
-        self.yolov5 = soft_import("yolov5")
+        self.ultralytics = soft_import("ultralytics")
         self.sklearn = soft_import("sklearn")
         self.mmseg = soft_import("mmseg")
         self.sahi = soft_import("sahi")

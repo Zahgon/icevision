@@ -1,16 +1,19 @@
 __all__ = ["ModelAdapter"]
 
-from icevision.imports import *
-from icevision.metrics import *
+from abc import ABC
+from typing import List
+
+from torch import nn
+
 from icevision.engines.lightning.lightning_model_adapter import LightningModelAdapter
+from icevision.metrics import Metric
 from icevision.models.ultralytics import yolov5
-from yolov5.utils.loss import ComputeLoss
 
 
 class ModelAdapter(LightningModelAdapter, ABC):
     """Lightning module specialized for EfficientDet, with metrics support.
 
-    The methods `forward`, `training_step`, `validation_step`, `validation_epoch_end`
+    The methods `forward`, `training_step`, `validation_step`, `on_validation_epoch_end`
     are already overriden.
 
     # Arguments
@@ -24,7 +27,6 @@ class ModelAdapter(LightningModelAdapter, ABC):
     def __init__(self, model: nn.Module, metrics: List[Metric] = None):
         super().__init__(metrics=metrics)
         self.model = model
-        self.compute_loss = ComputeLoss(model)
 
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)
@@ -33,11 +35,14 @@ class ModelAdapter(LightningModelAdapter, ABC):
         (xb, yb), _ = batch
         preds = self(xb)
 
-        loss = self.compute_loss(preds, yb)[0]
+        loss = self.compute_loss(preds, yb)
 
         self.log("train_loss", loss)
 
         return loss
+
+    def compute_loss(self, preds, yb):
+        return yolov5.loss_fn(preds, yb, self.model)
 
     def validation_step(self, batch, batch_idx):
         self._shared_eval(batch, loss_log_key="val")
@@ -53,7 +58,7 @@ class ModelAdapter(LightningModelAdapter, ABC):
             detection_threshold=0.001,
             nms_iou_threshold=0.6,
         )
-        loss = self.compute_loss(training_out, yb)[0]
+        loss = self.compute_loss(training_out, yb)
 
         self.accumulate_metrics(preds)
 
@@ -70,11 +75,11 @@ class ModelAdapter(LightningModelAdapter, ABC):
             nms_iou_threshold=nms_iou_threshold,
         )
 
-    def validation_epoch_end(self, outs):
+    def on_validation_epoch_end(self):
         self.finalize_metrics()
 
     def test_step(self, batch, batch_idx):
         self._shared_eval(batch=batch, loss_log_key="test")
 
-    def test_epoch_end(self, outs):
+    def on_test_epoch_end(self):
         self.finalize_metrics()

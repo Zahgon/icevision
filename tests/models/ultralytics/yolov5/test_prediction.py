@@ -1,6 +1,8 @@
 import pytest
-from icevision.all import *
-from icevision.models.ultralytics.yolov5.backbones import *
+
+from icevision import tfms, models
+from icevision.core.bbox import BBox
+from icevision.models.ultralytics.yolov5.backbones import small, medium, large, extra_large
 import albumentations as A
 from icevision.models.inference_sahi import IceSahiModel
 from sahi.prediction import PredictionResult

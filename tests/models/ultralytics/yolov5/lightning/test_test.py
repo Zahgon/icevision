@@ -1,6 +1,14 @@
+import random
+
 import pytest
-from icevision.all import *
-from icevision.models.ultralytics.yolov5.backbones import *
+import torch
+from torch.optim import SGD
+import lightning.pytorch as L
+
+from icevision import models
+from icevision.metrics import COCOMetric
+from icevision.metrics.coco_metric.coco_metric import COCOMetricType
+from icevision.models.ultralytics.yolov5.backbones import small, medium, large, extra_large
 
 
 @pytest.fixture
@@ -29,12 +37,12 @@ def test_lightning_yolo_test(fridge_ds, backbone, light_model_cls):
         valid_ds, batch_size=3, num_workers=0, shuffle=False
     )
     model = models.ultralytics.yolov5.model(
-        num_classes=5, img_size=384, backbone=backbone(pretrained=True)
+        num_classes=5, img_size=384, backbone=backbone(pretrained=False)
     )
     metrics = [COCOMetric(metric_type=COCOMetricType.bbox)]
     light_model = light_model_cls(model, metrics=metrics)
-    gpus = 1 if torch.cuda.is_available() else 0
-    trainer = pl.Trainer(max_epochs=1, gpus=gpus)
+    accelerator = 'cuda' if torch.cuda.is_available() else 'cpu'
+    trainer = L.Trainer(max_epochs=1, accelerator=accelerator)
 
     trainer.test(light_model, valid_dl)
 
@@ -51,7 +59,7 @@ def test_lightning_yolo_finalizes_metrics_on_test_epoch_end(backbone, light_mode
         metrics = [COCOMetric(metric_type=COCOMetricType.bbox)]
         light_model = light_model_cls(model, metrics=metrics)
 
-        light_model.test_epoch_end(None)
+        light_model.on_test_epoch_end()
 
         assert light_model.was_finalize_metrics_called == True
 
@@ -86,7 +94,7 @@ def test_lightning_yolo_logs_losses_during_test_step(fridge_ds, backbone):
         light_model = LightModel(model)
         light_model.to("cpu")
         light_model.eval()
-        light_model.compute_loss = lambda *args: [random.randint(0, 10)]
+        light_model.compute_loss = lambda *args: random.randint(0, 10)
         for batch in valid_dl:
             batch
             break

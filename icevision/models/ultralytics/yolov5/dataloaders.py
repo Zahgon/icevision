@@ -7,9 +7,15 @@ __all__ = [
     "infer_dl",
 ]
 
-from icevision.imports import *
-from icevision.core import *
-from icevision.models.utils import *
+from typing import Dict, Tuple, Sequence, List
+
+import torch
+from torch import tensor
+from torch.utils.data import DataLoader
+from torchvision.transforms.functional import to_tensor
+
+from icevision.core.record_type import RecordType
+from icevision.models.utils import transform_dl
 
 
 def train_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
@@ -60,7 +66,7 @@ def _build_train_sample(
 
 def build_train_batch(
     records: Sequence[RecordType],
-) -> Tuple[List[torch.Tensor], List[Dict[str, torch.Tensor]]]:
+) -> Tuple[Tuple[torch.Tensor, Dict[str, torch.Tensor]], RecordType]:
     """Builds a batch in the format required by the model when training.
 
     # Arguments
@@ -89,7 +95,10 @@ def build_train_batch(
 
         targets.append(target)
 
-    return (torch.stack(images, 0), torch.cat(targets, 0)), records
+    targets_stacked = torch.cat(targets, 0)
+    batch_idx, cls, bboxes = targets_stacked.tensor_split([1, 2], axis=1)
+    target_dicted = dict(batch_idx=batch_idx, cls=cls, bboxes=bboxes)
+    return (torch.stack(images, 0), target_dicted), records
 
 
 def valid_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:

@@ -1,6 +1,8 @@
 import pytest
-from icevision.all import *
+
+from icevision import models
 from icevision.models.ultralytics.yolov5.backbones import *
+from icevision.utils.data_dir import get_root_dir
 
 
 @pytest.mark.parametrize(

@@ -13,7 +13,7 @@ if SoftDependencies.mmdet:
     from icevision.models import mmdet
     from icevision.models.checkpoint import *
 
-if SoftDependencies.yolov5:
+if SoftDependencies.ultralytics:
     # HACK: yolov5 changes matplotlib backend here: https://github.com/ultralytics/yolov5/blob/77415a42e5975ea356393c9f1d5cff0ae8acae2c/utils/plots.py#L26
     import matplotlib
     from IPython import get_ipython

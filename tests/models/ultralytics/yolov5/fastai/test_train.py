@@ -1,6 +1,8 @@
 import pytest
-from icevision.all import *
-from icevision.models.ultralytics.yolov5.backbones import *
+from icevision import models
+from icevision.metrics import COCOMetric
+from icevision.metrics.coco_metric.coco_metric import COCOMetricType
+from icevision.models.ultralytics.yolov5.backbones import small, medium, large, extra_large
 
 
 @pytest.mark.parametrize(

@@ -33,6 +33,8 @@ dependencies = [
     "torchvision>=0.20.1",
     "fastai>=2.7.10,<2.8",
     "wandb>=0.18.5",
+    "ultralytics>=8.3.27",
+    "sahi>=0.11.18",
 ]
 
 

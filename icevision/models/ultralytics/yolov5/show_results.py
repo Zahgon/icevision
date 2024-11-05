@@ -1,12 +1,13 @@
 __all__ = ["show_results", "interp"]
 
-from icevision.imports import *
-from icevision.utils import *
-from icevision.core import *
-from icevision.data import *
+from typing import Optional
+
+import torch
+from torch import nn
+
+from icevision.data.dataset import Dataset
 from icevision.models.base_show_results import base_show_results
 from icevision.models.ultralytics.yolov5.dataloaders import (
-    build_infer_batch,
     valid_dl,
     infer_dl,
 )
@@ -18,7 +19,9 @@ from icevision.models.interpretation import Interpretation
 
 from icevision.models.interpretation import _move_to_device
 from icevision.core.record_components import LossesRecordComponent
-from yolov5.utils.loss import ComputeLoss
+from ultralytics.utils.loss import E2EDetectLoss
+from icevision.utils.torch_utils import tensor_to_image
+from icevision.utils.utils import denormalize_imagenet, pbar
 
 
 def show_results(
@@ -48,7 +51,7 @@ def show_results(
 
 def loop_yolo(dl, model, losses_stats, device):
     samples_plus_losses = []
-    compute_loss = ComputeLoss(model)
+    compute_loss = E2EDetectLoss(model)
 
     with torch.no_grad():
         for (x, y), sample in pbar(dl):

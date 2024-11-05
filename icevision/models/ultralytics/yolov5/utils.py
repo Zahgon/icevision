@@ -2,7 +2,6 @@ __all__ = [
     "YoloV5BackboneConfig",
 ]
 
-from icevision.imports import *
 from icevision.models.backbone_config import BackboneConfig
 
 

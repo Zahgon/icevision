@@ -1,5 +1,8 @@
-import pytest
-from icevision.all import *
+import numpy as np
+import torch
+from fastcore.basics import first
+
+from icevision import models
 
 
 def _test_dl(x, y, recs):

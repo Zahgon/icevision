@@ -1,15 +1,19 @@
 __all__ = ["model"]
 
-from icevision.imports import *
-from icevision.utils import *
+from types import MethodType
+from typing import Optional, List
 
-import yaml
-import yolov5
-from yolov5.models.yolo import Model
-from yolov5.utils.downloads import attempt_download
-from yolov5.utils.general import check_img_size, intersect_dicts
-from icevision.models.ultralytics.yolov5.utils import *
-from icevision.models.ultralytics.yolov5.backbones import *
+import torch
+from torch import nn
+from ultralytics import YOLO
+
+from ultralytics.nn import DetectionModel
+from ultralytics.utils.downloads import attempt_download_asset
+from ultralytics.utils.torch_utils import intersect_dicts
+
+from icevision.models.ultralytics.yolov5.backbones import YoloV5BackboneConfig
+from icevision.utils.data_dir import get_root_dir
+from icevision.utils.torch_utils import check_all_model_params_in_groups2
 
 yolo_dir = get_root_dir() / "yolo"
 yolo_dir.mkdir(exist_ok=True)
@@ -30,58 +34,13 @@ def model(
     # so we should pass `num_classes=parser.class_map.num_classes`
     num_classes -= 1
 
-    device = (
-        torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        if device is None
-        else device
-    )
-
-    if model_name in ["yolov5s", "yolov5m", "yolov5l", "yolov5x"]:
-        cfg_filepath = Path(yolov5.__file__).parent / f"models/{model_name}.yaml"
-    else:
-        cfg_filepath = Path(yolov5.__file__).parent / f"models/hub/{model_name}.yaml"
+    model = DetectionModel(f"{model_name}.yaml", nc=num_classes)
 
     if pretrained:
-        weights_path = yolo_dir / f"{model_name}.pt"
-
-        with open(Path(yolov5.__file__).parent / "data/hyps/hyp.VOC.yaml") as f:
-            hyp = yaml.safe_load(f)
-
-        attempt_download(weights_path)  # download if not found locally
-        sys.path.insert(0, str(Path(yolov5.__file__).parent))
-        ckpt = torch.load(weights_path, map_location=device)  # load checkpoint
-        sys.path.remove(str(Path(yolov5.__file__).parent))
-        if hyp.get("anchors"):
-            ckpt["model"].yaml["anchors"] = round(hyp["anchors"])  # force autoanchor
-        model = Model(cfg_filepath or ckpt["model"].yaml, ch=3, nc=num_classes).to(
-            device
-        )  # create
-        exclude = []  # exclude keys
-        state_dict = ckpt["model"].float().state_dict()  # to FP32
-        state_dict = intersect_dicts(
-            state_dict, model.state_dict(), exclude=exclude
-        )  # intersect
+        model_fp = attempt_download_asset(f"{model_name}.pt", dir=yolo_dir)
+        pretrained_model = YOLO(yolo_dir/model_fp)
+        state_dict = intersect_dicts(pretrained_model.model.state_dict(), model.state_dict())  # intersect
         model.load_state_dict(state_dict, strict=False)  # load
-    else:
-        with open(Path(yolov5.__file__).parent / "data/hyps/hyp.scratch-med.yaml") as f:
-            hyp = yaml.safe_load(f)
-
-        model = Model(
-            cfg_filepath, ch=3, nc=num_classes, anchors=hyp.get("anchors")
-        ).to(
-            device
-        )  # create
-
-    gs = int(model.stride.max())  # grid size (max stride)
-    nl = model.model[-1].nl  # number of detection layers (used for scaling hyp['obj'])
-    imgsz = check_img_size(img_size, gs)  # verify imgsz are gs-multiples
-
-    hyp["box"] *= 3.0 / nl  # scale to layers
-    hyp["cls"] *= num_classes / 80.0 * 3.0 / nl  # scale to classes and layers
-    hyp["obj"] *= (imgsz / 640) ** 2 * 3.0 / nl  # scale to image size and layers
-    model.nc = num_classes  # attach number of classes to model
-    model.hyp = hyp  # attach hyperparameters to model
-    model.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
 
     def param_groups_fn(model: nn.Module) -> List[List[nn.Parameter]]:
         spp_index = [

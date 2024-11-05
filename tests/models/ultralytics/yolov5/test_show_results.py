@@ -1,6 +1,8 @@
 import pytest
-from icevision.all import *
-from icevision.models.ultralytics.yolov5.backbones import *
+from matplotlib import pyplot as plt
+
+from icevision import models
+from icevision.models.ultralytics.yolov5.backbones import small, medium, large, extra_large
 
 
 @pytest.mark.parametrize(
