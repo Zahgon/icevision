@@ -1,13 +1,11 @@
-
+import timm
+from torch import nn
+from icevision.models.backbone_config import BackboneConfig
 
 
 class TimmBackboneConfig(BackboneConfig):
-    def __init__(self, model_name, backbone_fn, **backbone_fn_kwargs):
-
+    def __init__(self, model_name):
         self.model_name = model_name
-        self.backbone_fn = backbone_fn
-        self.backbone_fn_kwargs = backbone_fn_kwargs
-        self.backbone: nn.Module
 
     def __call__(self, pretrained: bool = True, **kwargs):
         """Completes the configuration of the backbone
@@ -18,9 +16,15 @@ class TimmBackboneConfig(BackboneConfig):
             `pretrained = False`  is used during inference (prediction) for cases where the users have their own pretrained weights.
         """
         self.pretrained = pretrained
-
-        # kwargs passed to call overwrite kwargs from init
-        kwargs = {**self.backbone_fn_kwargs, **kwargs}
-        self.backbone = self.backbone_fn(pretrained=pretrained, **kwargs)
+        self.backbone = timm.create_model(
+            self.model_name,
+            pretrained=pretrained,
+            features_only=True,
+            out_indices=(1, 2, 3, 4)
+        )
 
         return self
+
+
+
+resnet18 = TimmBackboneConfig("resnet18")

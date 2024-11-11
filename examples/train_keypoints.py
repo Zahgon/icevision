@@ -1,17 +1,10 @@
-from pathlib import Path
 import icedata
-from fastcore.utils import first
-from icevision import parsers, tfms, models
-from icevision.data.dataset import Dataset
-from icevision.metrics.coco_metric.coco_metric import COCOMetricType, COCOMetric
-from icevision.visualize.show_data import show_samples
+from icevision import models
+from matplotlib import pyplot as plt
+from fastcore.basics import first
 
 import lightning.pytorch as L
-import lightning.pytorch.loggers
 from torch.optim import AdamW
-from matplotlib import pyplot as plt
-
-
 
 if __name__ == "__main__":
     data_dir = icedata.biwi.load_data()
@@ -30,16 +23,16 @@ if __name__ == "__main__":
     # show_samples(samples, ncols=3)
 
     model_type = models.custom.keypoints
-    backbone = model_type.backbones.resnet18(pretrained=True)
-    model = model_type.model(backbone=backbone, num_keypoints=1, num_classes=icedata.biwi.NUM_CLASSES)
+    backbone = model_type.backbones.resnet18
+    model = model_type.model(backbone=backbone(pretrained=True), num_keypoints=1)
 
     # Data Loaders
-    num_workers = 8
-    train_dl = model_type.train_dl(train_ds, batch_size=16, num_workers=num_workers, shuffle=True)
-    valid_dl = model_type.valid_dl(valid_ds, batch_size=16, num_workers=num_workers, shuffle=False)
+    num_workers = 0
+    train_dl = model_type.train_dl(train_ds, batch_size=4, num_workers=num_workers, shuffle=True)
+    valid_dl = model_type.valid_dl(valid_ds, batch_size=4, num_workers=num_workers, shuffle=False)
 
-    # model_type.show_batch(first(valid_dl), ncols=4)
-    # plt.show()
+    model_type.show_batch(first(valid_dl), ncols=4)
+    plt.show()
 
 
     class LightModel(model_type.lightning.ModelAdapter):
@@ -53,5 +46,5 @@ if __name__ == "__main__":
     light_model = LightModel(model, metrics=metrics)
 
     callbacks = L.callbacks.ModelSummary(max_depth=2)
-    trainer = L.Trainer(max_epochs=5, logger=logger, log_every_n_steps=5, callbacks=callbacks)
+    trainer = L.Trainer(accelerator='gpu', max_epochs=5, logger=logger, log_every_n_steps=5, callbacks=callbacks)
     trainer.fit(light_model, train_dl, valid_dl)
