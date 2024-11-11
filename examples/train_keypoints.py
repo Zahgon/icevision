@@ -29,14 +29,14 @@ if __name__ == "__main__":
     samples = [train_ds[0] for _ in range(3)]
     # show_samples(samples, ncols=3)
 
-    model_type = models.torchvision.keypoint_rcnn
-    backbone = model_type.backbones.resnet18_fpn()
-    model = model_type.model(backbone=backbone(pretrained=True), num_keypoints=1, num_classes=icedata.biwi.NUM_CLASSES)
+    model_type = models.custom.keypoints
+    backbone = model_type.backbones.resnet18(pretrained=True)
+    model = model_type.model(backbone=backbone, num_keypoints=1, num_classes=icedata.biwi.NUM_CLASSES)
 
     # Data Loaders
-    num_workers = 2
-    train_dl = model_type.train_dl(train_ds, batch_size=8, num_workers=num_workers, shuffle=True)
-    valid_dl = model_type.valid_dl(valid_ds, batch_size=8, num_workers=num_workers, shuffle=False)
+    num_workers = 8
+    train_dl = model_type.train_dl(train_ds, batch_size=16, num_workers=num_workers, shuffle=True)
+    valid_dl = model_type.valid_dl(valid_ds, batch_size=16, num_workers=num_workers, shuffle=False)
 
     # model_type.show_batch(first(valid_dl), ncols=4)
     # plt.show()
@@ -53,5 +53,5 @@ if __name__ == "__main__":
     light_model = LightModel(model, metrics=metrics)
 
     callbacks = L.callbacks.ModelSummary(max_depth=2)
-    trainer = L.Trainer(accelerator='cpu', max_epochs=5, logger=logger, log_every_n_steps=5, callbacks=callbacks)
+    trainer = L.Trainer(max_epochs=5, logger=logger, log_every_n_steps=5, callbacks=callbacks)
     trainer.fit(light_model, train_dl, valid_dl)
