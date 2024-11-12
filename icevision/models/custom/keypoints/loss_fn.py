@@ -25,9 +25,6 @@ class KeypointLoss(nn.Module):
         Returns:
             torch.Tensor: Computed loss
         """
-        batch_size = pred.size(0)
-        num_keypoints = pred.size(1)
-
         # Compute MSE loss for each keypoint
         loss = self.criterion(pred, target)
         loss = loss.mean(dim=(2, 3))  # Average over spatial dimensions

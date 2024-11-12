@@ -50,19 +50,19 @@ class ModelAdapter(LightningModelAdapter, ABC):
 
         raw_preds = self(xb)
 
-        # preds = self.convert_raw_predictions(xb, yb, raw_preds, records)
+        preds = self.convert_raw_predictions(xb, yb, raw_preds, records)
+        self.accumulate_metrics(preds)
 
         loss = self.compute_loss(raw_preds, yb)
 
-        # self.accumulate_metrics(preds)
         self.log(f"{loss_log_key}_loss", loss, prog_bar=True)
 
     def convert_raw_predictions(self, xb, yb, raw_preds, records):
         # Note: raw_preds["detections"] key is available only during Pytorch Lightning validation/test step
         # Calling the method manually (instead of letting the Trainer call it) will raise an exception.
-        return efficientdet.convert_raw_predictions(
+        return keypoints.convert_raw_predictions(
             batch=(xb, yb),
-            raw_preds=raw_preds["detections"],
+            raw_preds=raw_preds,
             records=records,
             detection_threshold=0.0,
         )

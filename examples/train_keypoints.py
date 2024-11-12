@@ -32,7 +32,6 @@ if __name__ == "__main__":
     valid_dl = model_type.valid_dl(valid_ds, batch_size=4, num_workers=num_workers, shuffle=False)
 
     model_type.show_batch(first(valid_dl), ncols=4)
-    plt.show()
 
 
     class LightModel(model_type.lightning.ModelAdapter):
@@ -46,5 +45,8 @@ if __name__ == "__main__":
     light_model = LightModel(model, metrics=metrics)
 
     callbacks = L.callbacks.ModelSummary(max_depth=2)
-    trainer = L.Trainer(accelerator='gpu', max_epochs=5, logger=logger, log_every_n_steps=5, callbacks=callbacks)
+    trainer = L.Trainer(accelerator='gpu', max_epochs=1, logger=logger, log_every_n_steps=5, callbacks=callbacks)
     trainer.fit(light_model, train_dl, valid_dl)
+
+    model_type.show_results(model, valid_ds, detection_threshold=0.5)
+    plt.show()

@@ -80,7 +80,8 @@ def build_train_batch(records):
     batch_raw_keypoints = []
     batch_images = []
     for record in records:
-        record_raw_keypoints = [keypoint.xy for keypoint in record.detection.keypoints]
+        dividor = np.array([record.img_size.height, record.img_size.width])
+        record_raw_keypoints = [np.array(keypoint.xy)/dividor for keypoint in record.detection.keypoints]
         batch_raw_keypoints.extend(record_raw_keypoints)
         batch_images.append(to_tensor(record.img))
 
@@ -112,3 +113,32 @@ def build_valid_batch(records):
     ```
     """
     return build_train_batch(records)
+
+
+def build_infer_batch(records):
+    """Builds a batch in the format required by the model when doing inference.
+
+    # Arguments
+        records: A `Sequence` of records.
+
+    # Returns
+        A tuple with two items. The first will be a tuple like `(images, targets)`,
+        in the input format required by the model. The second will be a list
+        of the input records.
+    Use the result of this function to feed the model.
+    ```python
+    batch, records = build_infer_batch(records)
+    outs = model(*batch)
+    ```
+    """
+    batch_images = []
+    for record in records:
+        batch_images.append(to_tensor(record.img))
+
+    # convert to tensors
+    batch_images = torch.stack(batch_images)
+    # batch_sizes = torch.tensor(batch_sizes, dtype=torch.float32)
+
+    # convert to EffDet interface
+
+    return (batch_images, None), records
