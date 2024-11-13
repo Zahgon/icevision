@@ -12,9 +12,9 @@ from icevision.data.dataset import Dataset
 from icevision.data.prediction import Prediction
 from icevision.models.custom.keypoints.heatmap_decoder import HeatmapDecoder
 from icevision.models.custom.keypoints.model import KeypointNetwork
+from icevision.models.utils import _predict_from_dl
 from icevision.utils.torch_utils import model_device, tensor_to_image
 from icevision.models.custom.keypoints.dataloaders import build_infer_batch
-
 
 
 @torch.no_grad()
@@ -64,6 +64,7 @@ def predict(
         device=device,
     )
 
+
 def _construct_prediction(
     image_tensor,
     coord,
@@ -90,6 +91,7 @@ def _construct_prediction(
 
     return Prediction(pred=pred, ground_truth=record)
 
+
 def convert_raw_predictions(
     batch,
     raw_preds,
@@ -108,5 +110,22 @@ def convert_raw_predictions(
             record=record,
             keep_images=keep_images,
         )
-        for image_tensor, coord, score, record in zip(xb, coords, confs, records) if score > detection_threshold
+        for image_tensor, coord, score, record in zip(xb, coords, confs, records)
     ]
+
+
+def predict_from_dl(
+    model: nn.Module,
+    infer_dl: DataLoader,
+    show_pbar: bool = True,
+    keep_images: bool = False,
+    **predict_kwargs,
+):
+    return _predict_from_dl(
+        predict_fn=_predict_batch,
+        model=model,
+        infer_dl=infer_dl,
+        show_pbar=show_pbar,
+        keep_images=keep_images,
+        **predict_kwargs,
+    )

@@ -5,6 +5,7 @@ from torch import nn
 
 from icevision.engines.lightning.lightning_model_adapter import LightningModelAdapter
 from icevision.metrics import Metric
+from icevision.metrics.keypoints.keypoint_metrics import KeypointMetrics
 from icevision.models.custom import keypoints
 
 
@@ -22,10 +23,11 @@ class ModelAdapter(LightningModelAdapter, ABC):
         A `LightningModule`.
     """
 
-    def __init__(self, model: nn.Module, metrics: List[Metric] = None):
-        super().__init__(metrics=metrics)
+    def __init__(self, model: nn.Module):
+        super().__init__(metrics=[KeypointMetrics()])
         self.model = model
         self.loss_fn = keypoints.KeypointLoss()
+        # self.loss_fn = keypoints.JointsMSELoss()
 
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)

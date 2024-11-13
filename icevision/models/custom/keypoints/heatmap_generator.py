@@ -1,8 +1,6 @@
 import torch
 import numpy as np
 
-from icevision.models.custom.keypoints.loss_fn import KeypointLoss
-
 
 class KeypointHeatmapGenerator:
     def __init__(self, output_size, sigma=2):
