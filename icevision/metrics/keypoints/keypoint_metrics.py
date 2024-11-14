@@ -1,22 +1,23 @@
-import torch
-import numpy as np
-from scipy.optimize import linear_sum_assignment
+from typing import List
 
+import torch
 from icevision.metrics import Metric
 
 
 class KeypointMetrics(Metric):
-    def __init__(self):
+    def __init__(self, distance_thresholds: List[float] = None):
         """
         Initialize keypoint metrics calculator
 
         Args:
-            threshold (float): Distance threshold for PCK (normalized by head/torso size)
-            use_visibility (bool): Whether to consider keypoint visibility in calculations
+            distance_thresholds List[float]: Distance threshold for PCK
         """
         super().__init__()
         self.pred = []
         self.target = []
+        if distance_thresholds is None:
+            distance_thresholds = [0.01, 0.05, 0.1, 0.2]
+        self.distance_thresholds = distance_thresholds
 
     def _get_distance(self, pred, target):
         """Calculate Euclidean distance between predicted and target keypoints"""
@@ -65,7 +66,7 @@ class KeypointMetrics(Metric):
             visible = torch.ones_like(normalized_dist)
 
         metrics = {}
-        for t in [0.05, 0.1, 0.2, 0.3, 0.5]:
+        for t in self.distance_thresholds:
             correct = (normalized_dist <= t) & (visible > 0)
             pck = (correct & (visible > 0)).sum() / (visible > 0).sum()
             metrics[f'PCK@{t}'] = pck.item()
