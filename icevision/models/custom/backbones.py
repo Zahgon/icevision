@@ -1,5 +1,4 @@
 import timm
-from torch import nn
 from icevision.models.backbone_config import BackboneConfig
 
 
@@ -26,5 +25,7 @@ class TimmBackboneConfig(BackboneConfig):
         return self
 
 
-
 resnet18 = TimmBackboneConfig("resnet18")
+tf_efficientnet_b0 = TimmBackboneConfig("tf_efficientnet_b0")  # small
+tf_efficientnet_b2 = TimmBackboneConfig("tf_efficientnet_b2")  # medium
+tf_efficientnet_b4 = TimmBackboneConfig("tf_efficientnet_b4")  # large
