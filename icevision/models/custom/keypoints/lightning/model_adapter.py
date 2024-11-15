@@ -1,12 +1,15 @@
 from abc import ABC
-from typing import List
+from typing import List, Dict
 
-from torch import nn
+from lightning.pytorch.trainer.states import TrainerFn
+from torch import nn, compile
+from torch.optim import AdamW
 
 from icevision.engines.lightning.lightning_model_adapter import LightningModelAdapter
 from icevision.metrics import Metric
 from icevision.metrics.keypoints.keypoint_metrics import KeypointMetrics
 from icevision.models.custom import keypoints
+from icevision.utils.schedulers import WarmupCosineScheduler
 
 
 class ModelAdapter(LightningModelAdapter, ABC):
@@ -23,11 +26,24 @@ class ModelAdapter(LightningModelAdapter, ABC):
         A `LightningModule`.
     """
 
-    def __init__(self, model: nn.Module):
+    def __init__(self, model: nn.Module, learning_rate: float = 1e-4):
         super().__init__(metrics=[KeypointMetrics()])
         self.model = model
-        self.loss_fn = keypoints.KeypointLoss()
+        # self.loss_fn = keypoints.KeypointLoss()
         # self.loss_fn = keypoints.JointsMSELoss()
+        self.loss_fn = keypoints.KeypointHeatmapLoss()
+        self.save_hyperparameters("learning_rate")
+
+    def configure_optimizers(self):
+        warmup_epochs = max(int(0.05 * self.hparams.max_epochs), 2)
+        optimizer = AdamW(self.parameters(), lr=self.hparams.learning_rate)
+        scheduler = WarmupCosineScheduler(optimizer=optimizer, warmup_epochs=warmup_epochs, max_epochs=self.hparams.max_epochs)
+        return ({"optimizer": optimizer, "lr_scheduler": scheduler},)
+
+    def setup(self, stage: str):
+        if stage == TrainerFn.FITTING:
+            self.hparams["max_epochs"] = self.trainer.max_epochs
+            self.model = compile(self.model)
 
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)
