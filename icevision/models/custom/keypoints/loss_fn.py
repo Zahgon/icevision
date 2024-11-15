@@ -1,5 +1,6 @@
 import torch
 from torch import nn as nn
+from torch.nn import functional as F
 
 
 class KeypointLoss(nn.Module):
@@ -59,3 +60,29 @@ class JointsMSELoss(nn.Module):
             loss = loss.mean()
 
         return loss
+
+
+class KeypointHeatmapLoss(nn.Module):
+    def __init__(self, use_target_weight=True):
+        super().__init__()
+        self.use_target_weight = use_target_weight
+        self.loss_scale = 0.01
+
+    def forward(self, pred, target, target_weight=None):
+        """
+        Args:
+            pred: (B, K, H, W) predicted heatmaps
+            target: (B, K, H, W) target heatmaps
+            target_weight: (B, K) keypoint visibility
+        """
+        # Apply log softmax over spatial dimensions
+        log_prob = F.log_softmax(pred.reshape(*pred.shape[:2], -1), dim=2)
+        log_prob = log_prob.reshape_as(pred)
+
+        # Compute cross entropy loss
+        loss = -(target * log_prob).sum(dim=(2, 3)) * self.loss_scale
+
+        if self.use_target_weight and target_weight is not None:
+            loss = loss * target_weight
+
+        return loss.mean()
