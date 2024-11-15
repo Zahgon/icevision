@@ -85,7 +85,8 @@ def build_train_batch(records):
         batch_raw_keypoints.extend(record_raw_keypoints)
         batch_images.append(to_tensor(record.img))
 
-    hmgen = KeypointHeatmapGenerator((192, 192))
+    heatmap_shape = record.img_size.height // 2, record.img_size.width // 2
+    hmgen = KeypointHeatmapGenerator(heatmap_shape)
     # convert to tensors
     batch_heatmaps = hmgen(np.array(batch_raw_keypoints))
     batch_images = torch.stack(batch_images)
