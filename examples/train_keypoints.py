@@ -24,8 +24,8 @@ def main():
     train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath=data_dir/"cache_manual")
 
     # Create the parser
-    image_size = 512
-    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=512, crop_fn=None), tfms.A.Normalize()])
+    image_size = 768
+    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=max(512, image_size), crop_fn=None), tfms.A.Normalize()])
     valid_tfms = tfms.A.Adapter([*tfms.A.resize_and_pad(image_size), tfms.A.Normalize()])
 
     # Datasets
@@ -42,7 +42,7 @@ def main():
     train_dl = model_type.train_dl(train_ds, batch_size=32, num_workers=num_workers, shuffle=True)
     valid_dl = model_type.valid_dl(valid_ds, batch_size=32, num_workers=num_workers, shuffle=False)
 
-    logger = [L.loggers.WandbLogger(project="icevision-2.0-keypoints", group="fpn", notes="tf_efficientnet_b2", tags=["fp16", "512"])]
+    logger = [L.loggers.WandbLogger(project="icevision-2.0-keypoints", group="fpn", notes=backbone.model_name, tags=["fp16", str(image_size)])]
     # logger = []
     light_model = model_type.lightning.ModelAdapter(model, learning_rate=1e-4)
     # ckpt_path = "/home/ppotrykus/Programs/icevision/examples/icevision-2.0-keypoints/5j0cpwrq/checkpoints/076200_loss=0.00_PCK@0.5=0.970.ckpt"
