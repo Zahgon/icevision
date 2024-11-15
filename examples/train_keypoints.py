@@ -21,7 +21,7 @@ def main():
     data_dir = Path.home() / "datasets/plate_localization/v2"
     parser = VLPParser(annotations_filepath=data_dir / "metadata.csv")
 
-    train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath="manual")
+    train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath=data_dir/"cache_manual")
 
     # Create the parser
     image_size = 512
