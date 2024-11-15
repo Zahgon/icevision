@@ -40,23 +40,6 @@ def main():
     light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model)
     trainer = L.Trainer(accelerator='gpu', precision="16-mixed",)
     trainer.test(light_model, valid_dl)
-    # samples_plus_losses, preds, losses_stats = model_type.interp.plot_top_losses(model=light_model, dataset=valid_ds, sort_by="loss_total", n_samples=16)
-    # preds_list = []
-    # for pred, sample in zip(preds, samples_plus_losses):
-    #     p = pred.pred.detection.keypoints[0]
-    #
-    #     gt = sample.detection.keypoints[0]
-    #     h, w = sample.img_size.height, sample.img_size.width
-    #     d = (
-    #                 ((p.x - gt.x) / w) ** 2 + ((p.y - gt.y) / h) ** 2
-    #         ) ** 0.5
-    #     preds_list.append((sample.record_id, (p.x.item() / w, p.y.item() / h), d.item()))
-    #
-    # preds_df = pd.DataFrame.from_records(preds_list, columns=["image_filename", "lp_pred", "lp_distance"])
-    # labels = pd.read_csv(data_dir / "metadata.csv")
-    # run_id = Path(ckpt_path).parents[1].stem
-    # labels.merge(preds_df).to_csv(data_dir / f"preds/{run_id}.csv", index=False)
-
 
 if __name__ == "__main__":
     main()

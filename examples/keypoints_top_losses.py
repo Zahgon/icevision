@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from pathlib import Path
 
+import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 
@@ -11,29 +12,42 @@ from icevision.parsers.vlp_parser import VLPParser
 
 
 def main():
-    data_dir = Path.home() / "datasets/plate_localization/v1"
+    data_dir = Path.home() / "datasets/plate_localization/v2.1"
     parser = VLPParser(annotations_filepath=data_dir / "metadata.csv")
 
-    train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]))
+    train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath=data_dir/"cache_manual")
 
     # Create the parser
     image_size = 384
-    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=512, crop_fn=None), tfms.A.Normalize()])
     valid_tfms = tfms.A.Adapter([*tfms.A.resize_and_pad(image_size), tfms.A.Normalize()])
 
     # Datasets
-    train_ds = Dataset(train_records, train_tfms)
     valid_ds = Dataset(valid_records, valid_tfms)
+
     model_type = models.custom.keypoints
-    backbone = model_type.backbones.resnet18
-    model = model_type.model(backbone=backbone(pretrained=True), num_keypoints=1)
+    backbone = model_type.backbones.tf_efficientnet_b0
+    model = model_type.model(backbone=backbone(pretrained=False), num_keypoints=1)
 
-    # load model
-    model_checkpoint = "/home/ppotrykus/Programs/icevision/examples/icevision-2.0-keypoints/5j0cpwrq/checkpoints/076200_loss=0.00_PCK@0.5=0.970.ckpt"
-    light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(model_checkpoint, model=model)
-    samples_plus_losses, preds, losses_stats = model_type.interp.plot_top_losses(model=light_model, dataset=valid_ds, sort_by="loss_total", n_samples=4)
-    plt.show()
+    ckpt_path = "/home/ppotrykus/Programs/icevision/icevision-2.0-keypoints/hxvhcttu/checkpoints/056000_loss=1.59_PCK@0.1=0.879.ckpt"
+    model = torch.compile(model)
+    light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model)
 
+    samples_plus_losses, preds, losses_stats = model_type.interp.plot_top_losses(model=light_model, dataset=valid_ds, sort_by="loss_total", n_samples=16)
+    preds_list = []
+    for pred, sample in zip(preds, samples_plus_losses):
+        p = pred.pred.detection.keypoints[0]
+
+        gt = sample.detection.keypoints[0]
+        h, w = sample.img_size.height, sample.img_size.width
+        d = (
+                    ((p.x - gt.x) / w) ** 2 + ((p.y - gt.y) / h) ** 2
+            ) ** 0.5
+        preds_list.append((sample.record_id, (p.x.item() / w, p.y.item() / h), d.item()))
+
+    preds_df = pd.DataFrame.from_records(preds_list, columns=["image_filename", "lp_pred", "lp_distance"])
+    labels = pd.read_csv(data_dir / "metadata.csv")
+    run_id = Path(ckpt_path).parents[1].stem
+    labels.merge(preds_df).to_csv(data_dir / f"preds/{run_id}.csv", index=False)
 
 if __name__ == '__main__':
     main()
