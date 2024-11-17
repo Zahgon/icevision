@@ -6,15 +6,11 @@ from fastcore.basics import first
 
 import lightning.pytorch as L
 import lightning.pytorch.loggers
-from torch.optim import AdamW
-from torch.optim import lr_scheduler
 
 from icevision.data.data_splitter import FolderSplitter
 from icevision.data.dataset import Dataset
-from icevision.metrics import KeypointMetrics
 from icevision.parsers.vlp_parser import VLPParser
 from icevision import tfms
-from icevision.utils.schedulers import WarmupCosineScheduler
 from icevision.visualize.show_data import show_samples
 
 def main():
