@@ -56,6 +56,9 @@ class VLPParser(Parser):
     def prepare(self, o):
         if o.source != "manual":
             raise AbortParseRecord("auto annotated")
+        if not self.filepath(o).exists():
+            raise AbortParseRecord("image not found")
+
 
     def parse_fields(self, o, record, is_new):
         if is_new:
