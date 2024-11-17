@@ -35,14 +35,14 @@ def main():
     # Data Loaders
     num_workers = 6
     max_epochs = 100
-    train_dl = model_type.train_dl(train_ds, batch_size=32, num_workers=num_workers, shuffle=True)
-    valid_dl = model_type.valid_dl(valid_ds, batch_size=32, num_workers=num_workers, shuffle=False)
+    torch_compile = True
 
-    logger = [L.loggers.WandbLogger(project="icevision-2.0-keypoints", group="fpn", notes="tf_efficientnet_b2", tags=["fp16", "512"])]
+    train_dl = model_type.train_dl(train_ds, batch_size=16, num_workers=num_workers, shuffle=True)
+    valid_dl = model_type.valid_dl(valid_ds, batch_size=16, num_workers=num_workers, shuffle=False)
+
+    logger = [L.loggers.WandbLogger(project="icevision-2.0-keypoints", group="fpn", notes=backbone.model_name, tags=["fp16", str(image_size)])]
     # logger = []
-    light_model = model_type.lightning.ModelAdapter(model, learning_rate=1e-4)
-    # ckpt_path = "/home/ppotrykus/Programs/icevision/examples/icevision-2.0-keypoints/5j0cpwrq/checkpoints/076200_loss=0.00_PCK@0.5=0.970.ckpt"
-    # light_model = LightModel.load_from_checkpoint(ckpt_path, model=model)
+    light_model = model_type.lightning.ModelAdapter(model, learning_rate=1e-4, torch_compile=torch_compile)
 
     callbacks = [
         L.callbacks.ModelSummary(max_depth=2),
