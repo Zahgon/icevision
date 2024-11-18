@@ -20,10 +20,25 @@ def resize_and_pad(
     width, height = (size, size) if isinstance(size, int) else size
     return [resize(size), pad(min_height=height, min_width=width)]
 
-
+# TODO: fixme
+heavy_augs = (
+        A.ChannelShuffle(p=0.1),
+        A.ToGray(p=0.1),
+        A.SomeOf(
+            [
+                # tfms.A.CoarseDropout(max_holes=16, min_holes=4, max_height=64, max_width=64, min_height=16, min_width=16),
+                A.ISONoise(),
+                A.ImageCompression(15, 50),
+                A.MotionBlur(),
+                A.RandomFog(fog_coef_lower=0.05, fog_coef_upper=0.5, alpha_coef=0.04)
+            ],
+            3
+        )
+    )
 def aug_tfms(
     size: Union[int, Tuple[int, int]],
     presize: Optional[Union[int, Tuple[int, int]]] = None,
+    include_heavy: bool = False,
     horizontal_flip: Optional[A.HorizontalFlip] = A.HorizontalFlip(),
     shift_scale_rotate: Optional[A.ShiftScaleRotate] = A.ShiftScaleRotate(
         rotate_limit=15,
@@ -72,6 +87,8 @@ def aug_tfms(
 
     tfms = []
     tfms += [resize(presize, A.SmallestMaxSize) if presize is not None else None]
+    if include_heavy:
+        tfms += heavy_augs
     tfms += [horizontal_flip, shift_scale_rotate, rgb_shift, lighting, blur]
     # Resize as the last transforms to reduce the number of artificial artifacts created
     if crop_fn is not None:
