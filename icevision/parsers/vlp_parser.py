@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List, Hashable
 import pandas as pd
+from fastcore.basics import ifnone
 
 from icevision.core.class_map import ClassMap
 from icevision.core.exceptions import AbortParseRecord
@@ -59,7 +60,6 @@ class VLPParser(Parser):
         if not self.filepath(o).exists():
             raise AbortParseRecord("image not found")
 
-
     def parse_fields(self, o, record, is_new):
         if is_new:
             record.set_filepath(self.filepath(o))
@@ -71,7 +71,8 @@ class VLPParser(Parser):
         x, y = eval(o[3])
         x *= imsize.width
         y *= imsize.height
-        keypoints = [KeyPoints.from_xyv([x, y, 1], VLPKeypointsMetadata)]
+        visible = ifnone(o.visible, 0)  # switch visibility to 0 for None
+        keypoints = [KeyPoints.from_xyv([x, y, visible], VLPKeypointsMetadata)]
         record.detection.add_keypoints(keypoints)
 
 
