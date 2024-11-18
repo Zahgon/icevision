@@ -2,7 +2,7 @@ from abc import ABC
 from typing import List, Dict
 
 from lightning.pytorch.trainer.states import TrainerFn
-from torch import nn, compile, optim
+from torch import nn, compile, optim, _dynamo
 
 from icevision.engines.lightning.lightning_model_adapter import LightningModelAdapter
 from icevision.metrics import Metric
@@ -39,9 +39,12 @@ class ModelAdapter(LightningModelAdapter, ABC):
         scheduler = WarmupCosineScheduler(optimizer=optimizer, warmup_epochs=warmup_epochs, max_epochs=self.hparams.max_epochs)
         return ({"optimizer": optimizer, "lr_scheduler": scheduler},)
 
-    def setup(self, stage: str):
-        if self.hparams.torch_compile:
+    def configure_model(self) -> None:
+        already_compiled = isinstance(self.model, _dynamo.eval_frame.OptimizedModule)
+        if self.hparams.torch_compile and not already_compiled:
             self.model = compile(self.model)
+
+    def setup(self, stage: str):
         if stage == TrainerFn.FITTING:
             self.hparams["max_epochs"] = self.trainer.max_epochs
 
