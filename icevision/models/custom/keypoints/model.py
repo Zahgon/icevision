@@ -55,7 +55,7 @@ class FPN(nn.Module):
 
 
 class KeypointNetwork(nn.Module):
-    def __init__(self, backbone: TimmBackboneConfig, num_keypoints=17, use_fpn=True, fpn_channels=256):
+    def __init__(self, backbone: TimmBackboneConfig, num_keypoints=17, use_fpn=True, use_visibility=False, fpn_channels=256):
         """
         Simple keypoint detection network using a timm backbone
 
@@ -80,6 +80,18 @@ class KeypointNetwork(nn.Module):
             in_channels = fpn_channels
         else:
             in_channels = feature_dims[-1]
+
+        # Visibility classifier
+        self.use_visibility = use_visibility
+        if use_visibility:
+            self.visibility_head = nn.Sequential(
+                nn.AdaptiveAvgPool2d(1),
+                nn.Flatten(),
+                nn.Linear(in_channels, fpn_channels),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.5),
+                nn.Linear(fpn_channels, num_keypoints),
+            )
 
         # Simple decoder using transposed convolutions
         self.decoder = nn.Sequential(
@@ -125,10 +137,14 @@ class KeypointNetwork(nn.Module):
 
         # Decode to heatmaps
         heatmaps = self.decoder(x)
+        if self.use_visibility:
+            visibility = self.visibility_head(x)
+        else:
+            visibility = torch.ones_like(heatmaps[:, :, 0, 0])
 
-        return heatmaps
+        return heatmaps, visibility
 
 
-def model(backbone: TimmBackboneConfig, num_keypoints: int = 17, use_fpn: bool = True, fpn_channels: int = 256) -> nn.Module:
-    model = KeypointNetwork(backbone=backbone, num_keypoints=num_keypoints, use_fpn=use_fpn, fpn_channels=fpn_channels)
+def model(backbone: TimmBackboneConfig, num_keypoints: int = 17, use_fpn: bool = True, use_visibility: bool = False, fpn_channels: int = 256) -> nn.Module:
+    model = KeypointNetwork(backbone=backbone, num_keypoints=num_keypoints, use_fpn=use_fpn, use_visibility=use_visibility, fpn_channels=fpn_channels)
     return model

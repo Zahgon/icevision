@@ -68,13 +68,14 @@ def predict(
 def _construct_prediction(
     image_tensor,
     coord,
+    visibility,
     score,
     record: BaseRecord,
     keep_images: bool = False,
 ) -> Prediction:
     # build prediction
-    keypoints = KeyPoints.from_xyv([*coord.cpu().squeeze(), 1], None)
-    torch.hstack([coord, torch.tensor([[1]], device=coord.device)])
+    xyv = torch.cat((coord, visibility.unsqueeze(1)), dim=1)
+    keypoints = KeyPoints.from_xyv(xyv.cpu().view(-1), None)
     pred = BaseRecord(
         (
             ScoresRecordComponent(),
@@ -101,16 +102,18 @@ def convert_raw_predictions(
 ) -> List[Prediction]:
     xb, yb = batch
     heatmap_decoder = HeatmapDecoder(output_stride=2)
-    coords, confs = heatmap_decoder(raw_preds, return_confidence=True)
+    heatmap, visibility = raw_preds
+    coords, confs = heatmap_decoder(heatmap)
     return [
         _construct_prediction(
             image_tensor=image_tensor,
             coord=coord,
+            visibility=v,
             score=score,
             record=record,
             keep_images=keep_images,
         )
-        for image_tensor, coord, score, record in zip(xb, coords, confs, records)
+        for image_tensor, coord, v, score, record in zip(xb, coords, visibility, confs, records)
     ]
 
 

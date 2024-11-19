@@ -83,13 +83,12 @@ class HeatmapDecoder:
 
         return coords
 
-    def __call__(self, heatmaps, return_confidence=True):
+    def __call__(self, heatmaps):
         """
         Decode heatmaps to keypoint coordinates
 
         Args:
             heatmaps (torch.Tensor): Predicted heatmaps (B, K, H, W)
-            return_confidence (bool): Whether to return confidence scores
 
         Returns:
             torch.Tensor: Coordinates in original image space (B, K, 2)
@@ -104,47 +103,4 @@ class HeatmapDecoder:
 
         # Scale coordinates to original image space
         coords = coords * self.output_stride
-
-        if return_confidence:
-            return coords, maxvals
-        return coords
-
-
-# Example usage with confidence threshold
-def get_keypoints_with_confidence(heatmaps, conf_threshold=0.3):
-    """
-    Get keypoints with confidence filtering
-
-    Args:
-        heatmaps (torch.Tensor): Predicted heatmaps (B, K, H, W)
-        conf_threshold (float): Confidence threshold for valid keypoints
-
-    Returns:
-        torch.Tensor: Coordinates (B, K, 2)
-        torch.Tensor: Binary visibility flags (B, K)
-    """
-    decoder = HeatmapDecoder(output_stride=4, use_dark=True)
-    coords, conf = decoder(heatmaps, return_confidence=True)
-
-    # Create visibility mask based on confidence
-    visible = (conf > conf_threshold)
-
-    return coords, visible
-
-
-if __name__ == "__main__":
-    # Create sample heatmaps (batch_size=2, num_keypoints=17, height=64, width=64)
-    heatmaps = torch.randn(2, 17, 64, 64)
-    heatmaps = F.softmax(heatmaps.reshape(2, 17, -1), dim=2).reshape(2, 17, 64, 64)
-
-    # Initialize decoder
-    decoder = HeatmapDecoder(output_stride=4, use_dark=True)
-
-    # Get keypoints
-    coords, conf = decoder(heatmaps, return_confidence=True)
-    print(f"Coordinates shape: {coords.shape}")
-    print(f"Confidence shape: {conf.shape}")
-
-    # Get keypoints with confidence threshold
-    coords, visible = get_keypoints_with_confidence(heatmaps, conf_threshold=0.3)
-    print(f"\nValid keypoints: {visible.sum().item()}/{visible.numel()}")
+        return coords, maxvals

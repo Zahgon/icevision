@@ -63,26 +63,37 @@ class JointsMSELoss(nn.Module):
 
 
 class KeypointHeatmapLoss(nn.Module):
-    def __init__(self, use_target_weight=True):
+    def __init__(self, ignore_invisible=True):
         super().__init__()
-        self.use_target_weight = use_target_weight
-        self.loss_scale = 0.01
+        self.ignore_invisible = ignore_invisible
+        self.heatmap_scale = 0.01
+        self.visibility_scale = 1.0
 
-    def forward(self, pred, target, target_weight=None):
+    def forward(self, pred_in, target_in):
         """
         Args:
             pred: (B, K, H, W) predicted heatmaps
             target: (B, K, H, W) target heatmaps
-            target_weight: (B, K) keypoint visibility
+            pred_visibility: (B, K) keypoint visibility
+            target_visibility: (B, K) keypoint visibility
         """
         # Apply log softmax over spatial dimensions
+        pred, pred_visibility = pred_in
+        target, target_visibility = target_in
         log_prob = F.log_softmax(pred.reshape(*pred.shape[:2], -1), dim=2)
         log_prob = log_prob.reshape_as(pred)
 
         # Compute cross entropy loss
-        loss = -(target * log_prob).sum(dim=(2, 3)) * self.loss_scale
+        heatmap_loss = -(target * log_prob).sum(dim=(2, 3))
 
-        if self.use_target_weight and target_weight is not None:
-            loss = loss * target_weight
+        if self.ignore_invisible:
+            heatmap_loss = heatmap_loss * target_visibility
 
-        return loss.mean()
+        visibility_loss = F.binary_cross_entropy_with_logits(
+            pred_visibility,
+            target_visibility,
+            reduction='mean'
+        )
+
+        total_loss = heatmap_loss.mean() * self.heatmap_scale + visibility_loss * self.visibility_scale
+        return dict(loss=total_loss, heatmap_loss=heatmap_loss.mean(), visibility_loss=visibility_loss)

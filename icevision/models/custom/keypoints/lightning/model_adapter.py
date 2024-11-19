@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import List, Dict
 
+import torch
 from lightning.pytorch.trainer.states import TrainerFn
 from torch import nn, compile, optim, _dynamo
 
@@ -25,13 +26,13 @@ class ModelAdapter(LightningModelAdapter, ABC):
         A `LightningModule`.
     """
 
-    def __init__(self, model: nn.Module, learning_rate: float = 1e-4, torch_compile: bool = True):
+    def __init__(self, model: nn.Module, learning_rate: float = 1e-4, torch_compile: bool = True, ignore_invisible: bool = False):
         super().__init__(metrics=[KeypointMetrics()])
         self.model = model
         # self.loss_fn = keypoints.KeypointLoss()
         # self.loss_fn = keypoints.JointsMSELoss()
-        self.loss_fn = keypoints.KeypointHeatmapLoss()
-        self.save_hyperparameters("learning_rate", "torch_compile")
+        self.loss_fn = keypoints.KeypointHeatmapLoss(ignore_invisible=ignore_invisible)
+        self.save_hyperparameters("learning_rate", "torch_compile", "ignore_invisible")
 
     def configure_optimizers(self):
         warmup_epochs = max(int(0.05 * self.hparams.max_epochs), 2)
@@ -56,7 +57,8 @@ class ModelAdapter(LightningModelAdapter, ABC):
         raw_preds = self(xb)
         loss = self.compute_loss(raw_preds, yb)
 
-        self.log(f"train_loss", loss)
+        for key, val in loss.items():
+            self.log(f"train_loss/{key}", val, prog_bar=key == "loss")
 
         return loss
 
@@ -76,7 +78,8 @@ class ModelAdapter(LightningModelAdapter, ABC):
 
         loss = self.compute_loss(raw_preds, yb)
 
-        self.log(f"{loss_log_key}_loss", loss, prog_bar=True)
+        for key, val in loss.items():
+            self.log(f"{loss_log_key}_loss/{key}", val, prog_bar=key == "loss")
 
     def convert_raw_predictions(self, xb, yb, raw_preds, records):
         # Note: raw_preds["detections"] key is available only during Pytorch Lightning validation/test step

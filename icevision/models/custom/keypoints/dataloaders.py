@@ -80,18 +80,18 @@ def build_train_batch(records):
     batch_raw_keypoints = []
     batch_images = []
     for record in records:
-        dividor = np.array([record.img_size.height, record.img_size.width])
-        record_raw_keypoints = [np.array(keypoint.xy)/dividor for keypoint in record.detection.keypoints]
+        norm = np.array([record.img_size.height, record.img_size.width, 1.0])
+        record_raw_keypoints = [keypoint.xyv/norm for keypoint in record.detection.keypoints]
         batch_raw_keypoints.extend(record_raw_keypoints)
         batch_images.append(to_tensor(record.img))
 
     heatmap_shape = record.img_size.height // 2, record.img_size.width // 2
     hmgen = KeypointHeatmapGenerator(heatmap_shape)
     # convert to tensors
-    batch_heatmaps = hmgen(np.array(batch_raw_keypoints))
+    batch_data = hmgen(np.array(batch_raw_keypoints))
     batch_images = torch.stack(batch_images)
 
-    return (batch_images, batch_heatmaps), records
+    return (batch_images, batch_data), records
 
 
 def build_valid_batch(records):

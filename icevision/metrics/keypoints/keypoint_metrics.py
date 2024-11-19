@@ -2,6 +2,7 @@ from typing import List
 
 import torch
 from icevision.metrics import Metric
+from torchmetrics import Precision, Recall, MetricCollection, Accuracy
 
 
 class KeypointMetrics(Metric):
@@ -48,7 +49,7 @@ class KeypointMetrics(Metric):
         else:
             return torch.ones(keypoints.shape[0])
 
-    def pck(self, pred, target, visible=None):
+    def pck(self, pred, target):
         """
         Calculate PCK (Percentage of Correct Keypoints)
 
@@ -60,10 +61,10 @@ class KeypointMetrics(Metric):
         Returns:
             dict: PCK metrics at different thresholds
         """
-        normalized_dist = self._get_distance(torch.tensor(pred), torch.tensor(target))
-
-        if visible is None:
-            visible = torch.ones_like(normalized_dist)
+        pred_tensor = torch.tensor(pred)
+        target_tensor = torch.tensor(target)
+        normalized_dist = self._get_distance(pred_tensor[:, :2], target_tensor[:, :2])
+        visible = target_tensor[:, 2]
 
         metrics = {}
         for t in self.distance_thresholds:
@@ -73,20 +74,33 @@ class KeypointMetrics(Metric):
 
         return metrics
 
+    def classification_metrics(self):
+        metrics = MetricCollection([Precision(task="binary"), Recall(task="binary", average="macro")])
+        pred_tensor = torch.tensor(self.pred)
+        target_tensor = torch.tensor(self.target)
+        metrics.update(pred_tensor[:, 2], target_tensor[:, 2].long())
+        result = metrics.compute()
+        retval = {}
+        for key, value in result.items():
+            retval[key.replace("Binary", "Visibility")] = value.item()
+        return retval
+
+
     def accumulate(self, preds):
         for pred in preds:
             gt = pred.ground_truth
-            x, y = gt.detection.keypoints[0].xy[0]
+            x, y, v = gt.detection.keypoints[0].xyv[0]
             x /= gt.img_size.width
             y /= gt.img_size.height
-            self.target.append((x, y))
+            self.target.append((x, y, v))
             p = pred.pred
-            x, y = p.detection.keypoints[0].xy[0]
+            x, y, v = p.detection.keypoints[0].xyv[0]
             x /= gt.img_size.width
             y /= gt.img_size.height
-            self.pred.append((x, y))
+            self.pred.append((x, y, v))
 
     def finalize(self):
         """Calculate all metrics at once"""
         metrics = self.pck(self.pred, self.target)
-        return metrics
+        classification_metrics = self.classification_metrics()
+        return metrics | classification_metrics
