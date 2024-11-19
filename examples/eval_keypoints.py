@@ -15,10 +15,10 @@ from icevision import tfms
 
 
 def main():
-    data_dir = Path.home() / "datasets/plate_localization/v2"
+    data_dir = Path.home() / "datasets/plate_localization/v2.1"
     parser = VLPParser(annotations_filepath=data_dir / "metadata.csv")
 
-    train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath=data_dir/"cache_manual")
+    train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath=data_dir/"cache_manual_visibility")
 
     # Create the parser
     image_size = 512
@@ -28,17 +28,17 @@ def main():
     valid_ds = Dataset(valid_records, valid_tfms)
 
     model_type = models.custom.keypoints
-    backbone = model_type.backbones.tf_efficientnet_b2
+    backbone = model_type.backbones.tf_efficientnet_b0
     model = model_type.model(backbone=backbone(pretrained=False), num_keypoints=1)
 
     # Data Loaders
-    num_workers = 8
+    num_workers = 6
     valid_dl = model_type.valid_dl(valid_ds, batch_size=32, num_workers=num_workers, shuffle=False)
 
-    ckpt_path = "/home/ppotrykus/Programs/icevision/icevision-2.0-keypoints/r1zl02br/checkpoints/056000_loss=1.66_PCK@0.1=0.879.ckpt"
-    model = torch.compile(model)
-    light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model)
-    trainer = L.Trainer(accelerator='gpu', precision="16-mixed",)
+    ckpt_path = "/home/ppotrykus/Programs/icevision/icevision-2.0-keypoints/lty1e0bu/checkpoints/056000_loss=1.53_PCK@0.1=0.891.ckpt"
+    light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model, torch_compile=False)
+    trainer = L.Trainer(accelerator='gpu', precision="16-mixed", enable_checkpointing=False, limit_test_batches=1.0)
+    # trainer.fit(light_model, valid_dl)
     trainer.test(light_model, valid_dl)
 
 
