@@ -21,7 +21,7 @@ def main():
 
     # Create the parser
     image_size = 384
-    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=512, crop_fn=None), tfms.A.Normalize()])
+    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=512, crop_fn=None, include_heavy=True), tfms.A.Normalize()])
     valid_tfms = tfms.A.Adapter([*tfms.A.resize_and_pad(image_size), tfms.A.Normalize()])
 
     # Datasets
@@ -55,22 +55,19 @@ def main():
     callbacks = [
         L.callbacks.ModelSummary(max_depth=2),
         L.callbacks.LearningRateMonitor(logging_interval='epoch'),
-        # L.callbacks.ModelCheckpoint(
-        #     monitor="KeypointMetrics/PCK@0.1",
-        #     auto_insert_metric_name=False,
-        #     filename="{step:06d}_loss={val_loss:.2f}_PCK@0.1={KeypointMetrics/PCK@0.1:.3f}",
-        #     verbose=True,
-        #     mode="max",
-        # )
+        L.callbacks.ModelCheckpoint(
+            monitor="KeypointMetrics/PCK@0.1",
+            auto_insert_metric_name=False,
+            filename="{step:06d}_loss={val_loss:.2f}_PCK@0.1={KeypointMetrics/PCK@0.1:.3f}",
+            verbose=True,
+            mode="max",
+        )
     ]
     trainer = L.Trainer(
         accelerator='gpu',
         max_epochs=max_epochs,
         logger=logger,
         callbacks=callbacks,
-        limit_train_batches=0.1,
-        limit_val_batches=0.1,
-        enable_checkpointing=False,
         precision="16-mixed",
 
     )
