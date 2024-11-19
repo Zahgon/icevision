@@ -71,7 +71,10 @@ class VLPParser(Parser):
         x, y = eval(o[3])
         x *= imsize.width
         y *= imsize.height
-        visible = ifnone(o.visible, 0)  # switch visibility to 0 for None
+        if o.visible != o.visible:  # nan means not assigned in df
+            visible = 1.0
+        else:
+            visible = o.visible
         keypoints = [KeyPoints.from_xyv([x, y, visible], VLPKeypointsMetadata)]
         record.detection.add_keypoints(keypoints)
 
