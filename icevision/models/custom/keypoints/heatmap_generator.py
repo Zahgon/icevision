@@ -82,3 +82,39 @@ class KeypointHeatmapGenerator:
                         visibility[n, k] = 0
 
         return heatmaps, visibility
+
+
+if __name__ == "__main__":
+    import torch
+    import numpy as np
+    import matplotlib.pyplot as plt
+    # Initialize generator with 32x32 output size
+    generator = KeypointHeatmapGenerator(output_size=(512, 512))
+
+    # Create test keypoints
+    keypoints = np.array([
+        # Within bounds (0.5, 0.5)
+        [[0.5, 0.5, 0],
+         # Partially visible (-0.1, 0.5)
+         [-0.01, 0.5, 0],
+         # Outside bounds (1.2, 1.2)
+         [1.2, 1.2, 1]],
+    ])
+
+    # Generate heatmaps
+    heatmaps, visibility = generator(keypoints)
+
+    # Plot results
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    titles = ['Within bounds', 'Partially visible', 'Outside bounds']
+
+    for i in range(3):
+        axes[i].imshow(heatmaps[0, i].numpy(), cmap='hot')
+        axes[i].set_title(f"{titles[i]}\nVisibility: {visibility[0, i].item()}")
+        axes[i].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+    print("Heatmap shapes:", heatmaps.shape)
+    print("Max values:", [heatmaps[0, i].max().item() for i in range(3)])
