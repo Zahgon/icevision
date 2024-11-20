@@ -61,7 +61,9 @@ def _sum_losses_custom(loss):
 
 
 _LOSSES_DICT = {
-    "loss_total": [],
+    "loss": [],
+    "visibility_loss": [],
+    "heatmap_loss": [],
 }
 
 interp = Interpretation(
@@ -80,11 +82,12 @@ def loop_custom(dl, model, losses_stats, device):
             torch.manual_seed(0)
             x, y = _move_to_device(x, y, device)
             loss = model.training_step(((x, y), None), 0)
-            loss = loss.detach().cpu().numpy().item()
-            losses_stats["loss_total"].append(loss)
+
+            for name, val in loss.items():
+                losses_stats[name].append(val.cpu().numpy().item())
 
             loss_comp = LossesRecordComponent()
-            loss_comp.set_losses({"loss_total": loss})
+            loss_comp.set_losses({k: v[-1] for k, v in losses_stats.items()})
             sample[0].add_component(loss_comp)
             sample[0].set_img(tensor_to_image(x[0]))
             samples_plus_losses.append(sample[0])
