@@ -3,7 +3,7 @@ import numpy as np
 
 
 class KeypointHeatmapGenerator:
-    def __init__(self, output_size, sigma=2):
+    def __init__(self, output_size):
         """
         Initialize heatmap generator
 
@@ -12,7 +12,8 @@ class KeypointHeatmapGenerator:
             sigma (int): Standard deviation for Gaussian kernel
         """
         self.output_size = output_size
-        self.sigma = sigma
+        h, w = output_size
+        self.sigma = w // 32
         self.generate_gaussian_kernel()
 
     def generate_gaussian_kernel(self):
@@ -39,11 +40,12 @@ class KeypointHeatmapGenerator:
         """
         batch_size, num_keypoints, _ = keypoints.shape
         heatmaps = torch.zeros((batch_size, num_keypoints, *self.output_size))
-        visibility = torch.from_numpy(keypoints[:,:,2])
+        visibility = torch.from_numpy(keypoints[:, :, 2]).clone()
 
         for n in range(batch_size):
             for k in range(num_keypoints):
-                x, y, visible = keypoints[n, k]
+                x, y, _ = keypoints[n, k]  # Ignore visibility flag
+
                 # Convert to output space coordinates
                 x = x * self.output_size[1]
                 y = y * self.output_size[0]
@@ -52,19 +54,31 @@ class KeypointHeatmapGenerator:
                 x0 = int(x - self.kernel_size // 2)
                 y0 = int(y - self.kernel_size // 2)
 
-                # Calculate gaussian range
-                left, right = max(0, x0), min(self.output_size[1], x0 + self.kernel_size)
-                top, bottom = max(0, y0), min(self.output_size[0], y0 + self.kernel_size)
+                # Check if keypoint is completely out of bounds
+                if (x0 >= self.output_size[1] or
+                        y0 >= self.output_size[0] or
+                        x0 + self.kernel_size <= 0 or
+                        y0 + self.kernel_size <= 0):
+                    visibility[n, k] = 0
+                    continue
 
-                # Calculate gaussian patch range
+                # Calculate valid ranges for both the output heatmap and gaussian kernel
+                left = max(0, x0)
+                right = min(self.output_size[1], x0 + self.kernel_size)
+                top = max(0, y0)
+                bottom = min(self.output_size[0], y0 + self.kernel_size)
+
                 patch_left = max(0, -x0)
-                patch_right = self.kernel_size - max(0, x0 + self.kernel_size - self.output_size[1])
+                patch_right = min(self.kernel_size, self.output_size[1] - x0)
                 patch_top = max(0, -y0)
-                patch_bottom = self.kernel_size - max(0, y0 + self.kernel_size - self.output_size[0])
+                patch_bottom = min(self.kernel_size, self.output_size[0] - y0)
 
-                # Apply gaussian
-                heatmaps[n, k, top:bottom, left:right] = torch.from_numpy(
-                    self.gaussian[patch_top:patch_bottom, patch_left:patch_right]
-                )
+                if right > left and bottom > top:
+                    try:
+                        heatmaps[n, k, top:bottom, left:right] = torch.from_numpy(
+                            self.gaussian[patch_top:patch_bottom, patch_left:patch_right]
+                        )
+                    except ValueError:
+                        visibility[n, k] = 0
 
         return heatmaps, visibility
