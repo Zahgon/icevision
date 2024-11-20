@@ -115,6 +115,11 @@ def _move_to_device(x, y, device):
                 ]
             else:
                 y[k] = y[k].to(device) if isinstance(y[k], torch.Tensor) else y[k]
+    elif isinstance(
+        y, tuple
+    ):  # this covers custom keypoints model with visibility
+        x = x.to(device) if x is not None else x
+        y = (o.to(device) for o in y)
     else:
         return x.to(device), y.to(device)
     return x, y
