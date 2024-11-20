@@ -207,6 +207,7 @@ class Interpretation:
         n_samples: int = 5,
         batch_size: int = 8,
         device: torch.device = None,
+        **draw_sample_kwargs,
     ) -> Tuple[List[dict], List[dict], dict]:
         """
         Gets a dataset and a model as input. Calculates losses for each sample in the dataset.
@@ -272,6 +273,7 @@ class Interpretation:
         show_preds(
             preds=sorted_preds[:n_samples],
             annotations=anns[:n_samples],
+            **draw_sample_kwargs,
         )
         model.train()
         return sorted_samples, sorted_preds, losses_stats

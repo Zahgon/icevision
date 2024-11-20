@@ -32,7 +32,18 @@ def main():
     model = torch.compile(model)
     light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model)
 
-    samples_plus_losses, preds, losses_stats = model_type.interp.plot_top_losses(model=light_model, dataset=valid_ds, sort_by="loss_total", n_samples=16)
+    # model = torch.compile(model)
+    light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model, torch_compile=torch_compile, ignore_invisible=ignore_invisible)
+
+    samples_plus_losses, preds, losses_stats = model_type.interp.plot_top_losses(
+        model=light_model,
+        dataset=infer_ds,
+        sort_by="loss_total",
+        n_samples=n_samples,
+        color_map={"license_plate": (156.62, 160.5, 239.77)},
+        show=True
+    )
+    return
     preds_list = []
     for pred, sample in zip(preds, samples_plus_losses):
         p = pred.pred.detection.keypoints[0]
