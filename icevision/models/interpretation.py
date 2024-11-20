@@ -288,7 +288,7 @@ def add_annotations(samples: List[dict]) -> List[dict]:
         for key in sample.losses.keys():
             if "loss" in key:
                 text += f"{key}: {round(sample.losses[key], 5)}\n"
-        text += f"IMG: {sample.filepath.name}"
+        text += f"IMG: {sample.record_id}"
         sample.losses["text"] = text
     return samples
 

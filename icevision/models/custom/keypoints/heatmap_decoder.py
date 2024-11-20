@@ -19,11 +19,13 @@ class HeatmapDecoder:
         """Get predictions from score maps"""
         batch_size, num_keypoints, height, width = heatmaps.shape
 
-        # Flatten last two dimensions
-        heatmaps_reshaped = heatmaps.reshape((batch_size, num_keypoints, -1))
+        # Temperature scaling followed by sigmoid for score normalization
+        temperature = 10.0  # Adjust this value to control sharpness
+        heatmaps_temp = heatmaps / temperature
+        heatmaps_normalized = torch.sigmoid(heatmaps_temp)
 
         # Get max scores and locations
-        maxvals, idx = torch.max(heatmaps_reshaped, dim=2)
+        maxvals, idx = torch.max(heatmaps_normalized.reshape(batch_size, num_keypoints, -1), dim=2)
 
         # Convert indices to coordinates
         preds = torch.zeros((batch_size, num_keypoints, 2)).to(device=heatmaps.device)

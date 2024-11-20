@@ -85,6 +85,7 @@ def _construct_prediction(
         )
     )
     pred.detection.set_class_map(record.detection.class_map)
+    pred.detection.add_labels_by_id([1])
     pred.detection.set_scores(score)
     pred.detection.set_keypoints([keypoints])
     if keep_images:
@@ -103,7 +104,9 @@ def convert_raw_predictions(
     xb, yb = batch
     heatmap_decoder = HeatmapDecoder(output_stride=2)
     heatmap, visibility = raw_preds
+    # postprocessing
     coords, confs = heatmap_decoder(heatmap)
+    visibility = nn.functional.sigmoid(visibility)
     return [
         _construct_prediction(
             image_tensor=image_tensor,
