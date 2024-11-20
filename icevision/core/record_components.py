@@ -618,7 +618,7 @@ class KeyPointsRecordComponent(RecordComponent):
         return {"keypoints": objects}
 
     def _repr(self) -> List[str]:
-        return {f"KeyPoints: {self.keypoints}"}
+        return [f"KeyPoints: {self.keypoints}"]
 
 
 class ScoresRecordComponent(RecordComponent):
