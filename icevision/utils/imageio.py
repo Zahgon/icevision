@@ -169,7 +169,7 @@ def plot_grid(
     nrows = math.ceil(len(fs) * axs_per_iter / ncols)
     figsize = figsize or (12 * ncols, 12 * nrows)
 
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize, **kwargs)
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize, constrained_layout=True, **kwargs)
     axs = np.asarray(axs)
 
     if axs_per_iter == 1:
@@ -182,7 +182,6 @@ def plot_grid(
     for f, ax in zip(fs, axs):
         f(ax=ax)
 
-    plt.tight_layout()
     if show:
         plt.show()
 
