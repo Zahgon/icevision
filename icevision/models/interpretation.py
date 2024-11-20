@@ -32,7 +32,7 @@ def get_weighted_sum(sample, weights):
 
 
 def sort_losses(
-    samples: List[dict], preds: List[dict], by: Union[str, dict] = "loss_total"
+    samples: List[dict], preds: List[dict], by: Union[str, dict] = "loss_total", ascending: bool = False
 ) -> Tuple[List[dict], List[dict], List[str]]:
     by_copy = deepcopy(by)
     losses_expected = [
@@ -63,7 +63,7 @@ def sort_losses(
             by = "loss_weighted"
 
     l = list(zip(samples, preds))
-    l = sorted(l, key=lambda i: i[0].losses[by], reverse=True)
+    l = sorted(l, key=lambda i: i[0].losses[by], reverse=not ascending)
     sorted_samples, sorted_preds = zip(*l)
     annotations = [el.losses["text"] for el in sorted_samples]
 
@@ -204,6 +204,7 @@ class Interpretation:
         model: nn.Module,
         dataset: Dataset,
         sort_by: str = "loss_total",
+        ascending: bool = False,
         n_samples: int = 5,
         batch_size: int = 8,
         device: torch.device = None,
@@ -219,6 +220,7 @@ class Interpretation:
         model: nn.Module
         dataset: Dataset
         sort_by: (str) the loss to sort samples by
+        ascending: bool (default: False) similar to pandas sorting
         n_samples: how many samples to show
         batch_size: used when creating the infer dataloader to get model predictions on the dataset
 
@@ -242,7 +244,7 @@ class Interpretation:
         preds = [p.pred for p in preds]
 
         sorted_samples, sorted_preds, annotations = sort_losses(
-            samples, preds, by=sort_by
+            samples, preds, by=sort_by, ascending=ascending
         )
         assert len(sorted_samples) == len(samples) == len(preds) == len(sorted_preds)
 
