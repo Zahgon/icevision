@@ -21,22 +21,24 @@ def main():
     train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath=data_dir/"cache_manual_visibility")
 
     # Create the parser
-    image_size = 512
+    image_size = 384
+    ckpt_path = "/home/ppotrykus/Programs/icevision/icevision-2.0-keypoints/t74d6s3g/checkpoints/056000_loss=0.00_PCK@0.1=0.932.ckpt"
+    torch_compile = False
+    ignore_invisible = False
     valid_tfms = tfms.A.Adapter([*tfms.A.resize_and_pad(image_size), tfms.A.Normalize()])
 
     # Datasets
     valid_ds = Dataset(valid_records, valid_tfms)
 
     model_type = models.custom.keypoints
-    backbone = model_type.backbones.tf_efficientnet_b0
-    model = model_type.model(backbone=backbone(pretrained=False), num_keypoints=1)
+    backbone = model_type.backbones.tf_efficientnet_b2
+    model = model_type.model(backbone=backbone(pretrained=False), num_keypoints=1, use_visibility=True)
 
     # Data Loaders
     num_workers = 6
     valid_dl = model_type.valid_dl(valid_ds, batch_size=32, num_workers=num_workers, shuffle=False)
 
-    ckpt_path = "/home/ppotrykus/Programs/icevision/icevision-2.0-keypoints/lty1e0bu/checkpoints/056000_loss=1.53_PCK@0.1=0.891.ckpt"
-    light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model, torch_compile=False)
+    light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model, torch_compile=torch_compile, ignore_invisible=ignore_invisible)
     trainer = L.Trainer(accelerator='gpu', precision="16-mixed", enable_checkpointing=False, limit_test_batches=1.0)
     # trainer.fit(light_model, valid_dl)
     trainer.test(light_model, valid_dl)
