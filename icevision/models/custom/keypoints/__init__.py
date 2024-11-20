@@ -4,7 +4,7 @@ from icevision.models.custom.keypoints.loss_fn import KeypointLoss, JointsMSELos
 from icevision.models.custom import backbones
 from icevision.models.custom.show_batch import show_batch
 from icevision.models.custom.keypoints.show_results import show_results, interp
-from icevision.models.custom.keypoints.prediction import convert_raw_predictions
+from icevision.models.custom.keypoints.prediction import convert_raw_predictions, predict_from_dl
 from icevision.soft_dependencies import SoftDependencies
 
 if SoftDependencies.pytorch_lightning:
