@@ -62,14 +62,46 @@ class JointsMSELoss(nn.Module):
         return loss
 
 
+class WeightedDiceLoss(nn.Module):
+    def __init__(self, smooth=1.0):
+        super(WeightedDiceLoss, self).__init__()
+        self.smooth = smooth
+
+    def forward(self, predictions, targets, visibility, weights=None):
+        """
+        Calculate Weighted Dice Loss for continuous heatmap values
+        Args:
+            predictions (torch.Tensor): Predicted heatmap (B, C, H, W)
+            targets (torch.Tensor): Target heatmap (B, C, H, W)
+            visibility (torch.Tensor, optional): sample visibility (B, C)
+            weights (torch.Tensor, optional): Pixel-wise weights (B, C, H, W)
+        """
+        batch_size = predictions.size(0)
+        predictions = predictions.view(batch_size, -1)
+        targets = targets.view(batch_size, -1)
+
+        if weights is not None:
+            weights = weights.view(batch_size, -1)
+            intersection = (predictions * targets * weights).sum(dim=1)
+            union = (predictions * weights).sum(dim=1) + (targets * weights).sum(dim=1)
+        else:
+            intersection = (predictions * targets).sum(dim=1)
+            union = predictions.sum(dim=1) + targets.sum(dim=1)
+
+        dice = (2. * intersection + self.smooth) / (union + self.smooth)
+        return 1 - (dice * visibility).mean()
+
+
 class KeypointHeatmapLoss(nn.Module):
     def __init__(self, ignore_invisible=True):
         super().__init__()
         self.ignore_invisible = ignore_invisible
-        self.heatmap_scale = 100
+        self.smooth_scale = 100
+        self.dice_scale = 1
         self.visibility_scale = 10
         self.focal_gamma = 2.0
         self.smooth_loss = nn.SmoothL1Loss(reduction='none', beta=0.1)
+        self.dice_loss = WeightedDiceLoss()
 
     def forward(self, pred_in, target_in):
         """
@@ -83,20 +115,17 @@ class KeypointHeatmapLoss(nn.Module):
         pred, pred_visibility = pred_in
         target, target_visibility = target_in
 
-        # compute MSE loss
-        # heatmap_loss = (pred - target) ** 2
-        heatmap_loss = self.smooth_loss(pred, target)
-        heatmap_loss = heatmap_loss.mean((2, 3))
-        # Weight loss by how far prediction is from target
-        # heatmap_loss = heatmap_loss * ((1 - pred) ** self.focal_gamma)
+        pred = torch.sigmoid(pred)
 
-        # Compute cross entropy loss
-        # log_prob = F.log_softmax(pred.reshape(*pred.shape[:2], -1), dim=2)
-        # log_prob = log_prob.reshape_as(pred)
-        # heatmap_loss = -(target * log_prob).sum(dim=(2, 3))
+        # compute MSE loss
+        smooth_loss = self.smooth_loss(pred, target)
+        smooth_loss = smooth_loss.mean((2, 3))
 
         if self.ignore_invisible:
-            heatmap_loss = heatmap_loss * target_visibility
+            smooth_loss = (smooth_loss * target_visibility).mean()
+
+        # compute dice loss
+        dice_loss = self.dice_loss(pred, target, visibility=target_visibility)
 
         # step 1: Class weights
         neg_ratio = 1 - target_visibility.mean()
@@ -115,5 +144,5 @@ class KeypointHeatmapLoss(nn.Module):
 
         visibility_loss = (weighted_visibility_loss * focal_weight).mean()
 
-        total_loss = heatmap_loss.mean() * self.heatmap_scale + visibility_loss * self.visibility_scale
-        return dict(loss=total_loss, heatmap_loss=heatmap_loss.mean(), visibility_loss=visibility_loss)
+        total_loss = smooth_loss * self.smooth_scale + visibility_loss * self.visibility_scale + dice_loss * self.dice_scale
+        return dict(loss=total_loss, heatmap_loss=smooth_loss, visibility_loss=visibility_loss, dice_loss=dice_loss)
