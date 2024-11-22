@@ -97,7 +97,7 @@ class KeypointHeatmapLoss(nn.Module):
         super().__init__()
         self.ignore_invisible = ignore_invisible
         self.smooth_scale = 100
-        self.dice_scale = 1
+        self.dice_scale = 1/20
         self.visibility_scale = 10
         self.focal_gamma = 2.0
         self.smooth_loss = nn.SmoothL1Loss(reduction='none', beta=0.1)
