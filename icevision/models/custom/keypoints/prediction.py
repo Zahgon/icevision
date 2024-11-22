@@ -105,7 +105,9 @@ def convert_raw_predictions(
     heatmap, visibility = raw_preds
     # postprocessing
     coords, confs = heatmap_decoder(heatmap)
-    visibility = nn.functional.sigmoid(visibility)
+    visibilty_postprocessed = ((0 <= visibility).all() and (visibility <= 1).all()).item()
+    if not visibilty_postprocessed:
+        visibility = nn.functional.sigmoid(visibility)
     return [
         _construct_prediction(
             image_tensor=image_tensor,
