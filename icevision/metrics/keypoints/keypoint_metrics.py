@@ -2,7 +2,7 @@ from typing import List
 
 import torch
 from icevision.metrics import Metric
-from torchmetrics import Precision, Recall, MetricCollection, Accuracy
+from torchmetrics import Precision, Recall, MetricCollection, Accuracy, AUROC
 
 
 class KeypointMetrics(Metric):
@@ -75,16 +75,17 @@ class KeypointMetrics(Metric):
         return metrics
 
     def classification_metrics(self):
-        metrics = MetricCollection([Precision(task="binary"), Recall(task="binary", average="macro")])
-        pred_tensor = torch.tensor(self.pred)
-        target_tensor = torch.tensor(self.target)
-        metrics.update(pred_tensor[:, 2], target_tensor[:, 2].long())
+        pred_visibility = torch.tensor(self.pred)[:, 2]
+        target_visibility = torch.tensor(self.target)[:, 2].long()
+
+        metrics = MetricCollection([AUROC(task="binary")])
+        metrics.update(pred_visibility, target_visibility)
         result = metrics.compute()
+
         retval = {}
         for key, value in result.items():
             retval[key.replace("Binary", "Visibility")] = value.item()
         return retval
-
 
     def accumulate(self, preds):
         for pred in preds:
