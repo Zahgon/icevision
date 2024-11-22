@@ -66,8 +66,10 @@ class KeypointHeatmapLoss(nn.Module):
     def __init__(self, ignore_invisible=True):
         super().__init__()
         self.ignore_invisible = ignore_invisible
-        self.heatmap_scale = 0.01
-        self.visibility_scale = 1.0
+        self.heatmap_scale = 100
+        self.visibility_scale = 10
+        self.focal_gamma = 2.0
+        self.smooth_loss = nn.SmoothL1Loss(reduction='none', beta=0.1)
 
     def forward(self, pred_in, target_in):
         """
@@ -80,20 +82,38 @@ class KeypointHeatmapLoss(nn.Module):
         # Apply log softmax over spatial dimensions
         pred, pred_visibility = pred_in
         target, target_visibility = target_in
-        log_prob = F.log_softmax(pred.reshape(*pred.shape[:2], -1), dim=2)
-        log_prob = log_prob.reshape_as(pred)
+
+        # compute MSE loss
+        # heatmap_loss = (pred - target) ** 2
+        heatmap_loss = self.smooth_loss(pred, target)
+        heatmap_loss = heatmap_loss.mean((2, 3))
+        # Weight loss by how far prediction is from target
+        # heatmap_loss = heatmap_loss * ((1 - pred) ** self.focal_gamma)
 
         # Compute cross entropy loss
-        heatmap_loss = -(target * log_prob).sum(dim=(2, 3))
+        # log_prob = F.log_softmax(pred.reshape(*pred.shape[:2], -1), dim=2)
+        # log_prob = log_prob.reshape_as(pred)
+        # heatmap_loss = -(target * log_prob).sum(dim=(2, 3))
 
         if self.ignore_invisible:
             heatmap_loss = heatmap_loss * target_visibility
 
-        visibility_loss = F.binary_cross_entropy_with_logits(
+        # step 1: Class weights
+        neg_ratio = 1 - target_visibility.mean()
+        pos_weight = torch.tensor([neg_ratio / (1 - neg_ratio)], device=pred.device)
+        weighted_visibility_loss = F.binary_cross_entropy_with_logits(
             pred_visibility,
             target_visibility,
-            reduction='mean'
+            reduction='none',
+            pos_weight=pos_weight,
         )
+
+        # step 2: Add focal term
+        p = torch.sigmoid(pred_visibility)
+        pt = p * target_visibility + (1 - p) * (1 - target_visibility)
+        focal_weight = (1 - pt) ** self.focal_gamma
+
+        visibility_loss = (weighted_visibility_loss * focal_weight).mean()
 
         total_loss = heatmap_loss.mean() * self.heatmap_scale + visibility_loss * self.visibility_scale
         return dict(loss=total_loss, heatmap_loss=heatmap_loss.mean(), visibility_loss=visibility_loss)
