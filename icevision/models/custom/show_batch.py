@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+from icevision.models.custom import keypoints
 from icevision.utils.torch_utils import tensor_to_image
 from icevision.visualize.show_data import show_samples
 
@@ -11,9 +12,10 @@ def show_batch(batch, ncols: int = 1, figsize=None, **show_samples_kwargs):
     # Arguments
         show_samples_kwargs: Check the parameters from `show_samples`
     """
-    (tensor_images, heatmaps), records = batch
+    (tensor_images, (heatmaps, visible)), records = batch
 
-    for tensor_image, heatmap, record in zip(tensor_images, heatmaps, records):
+    preds = keypoints.convert_raw_predictions(batch=(tensor_images, None), raw_preds=(heatmaps, visible), records=records, keep_images=False)
+    for tensor_image, heatmap, pred, record in zip(tensor_images, heatmaps, preds, records):
         image = tensor_to_image(tensor_image)
         hm = heatmap.cpu().numpy().squeeze()
         # 1. Resize mask to match image dimensions
@@ -28,6 +30,7 @@ def show_batch(batch, ncols: int = 1, figsize=None, **show_samples_kwargs):
         alpha_channel = mask_resized
         result = image * (1 - alpha_channel[:, :, np.newaxis]) + overlay * alpha_channel[:, :, np.newaxis]
 
+        record.detection.set_keypoints(pred.pred.detection.keypoints)
         record.set_img(result)
 
     return show_samples(records, ncols=ncols, figsize=figsize, **show_samples_kwargs)

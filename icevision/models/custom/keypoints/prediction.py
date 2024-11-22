@@ -98,7 +98,6 @@ def convert_raw_predictions(
     batch,
     raw_preds,
     records: Sequence[BaseRecord],
-    detection_threshold: float,
     keep_images: bool = False,
 ) -> List[Prediction]:
     xb, yb = batch

@@ -26,7 +26,7 @@ class ModelAdapter(LightningModelAdapter, ABC):
         A `LightningModule`.
     """
 
-    def __init__(self, model: nn.Module, learning_rate: float = 1e-4, torch_compile: bool = True, ignore_invisible: bool = False):
+    def __init__(self, model: nn.Module, learning_rate: float = 1e-4, torch_compile: bool = True, ignore_invisible: bool = True):
         super().__init__(metrics=[KeypointMetrics()])
         self.model = model
         # self.loss_fn = keypoints.KeypointLoss()
@@ -88,7 +88,6 @@ class ModelAdapter(LightningModelAdapter, ABC):
             batch=(xb, yb),
             raw_preds=raw_preds,
             records=records,
-            detection_threshold=0.0,
         )
 
     def on_validation_epoch_end(self):
