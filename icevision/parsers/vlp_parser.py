@@ -21,11 +21,12 @@ class VLPKeypointsMetadata(KeypointsMetadata):
 
 
 class VLPParser(Parser):
-    def __init__(self, annotations_filepath, idmap=None):
+    def __init__(self, annotations_filepath, idmap=None, skip_unaudited=False):
         super().__init__(template_record=self.template_record(), idmap=idmap)
         self.annotations = pd.read_csv(annotations_filepath)
         self.img_dir = Path(annotations_filepath.parent) / "images"
         self.class_map = ClassMap(VLPKeypointsMetadata.labels)
+        self.skip_unaudited = skip_unaudited
 
     def __iter__(self):
         yield from self.annotations.itertuples()
@@ -55,6 +56,8 @@ class VLPParser(Parser):
         return [1]
 
     def prepare(self, o):
+        if self.skip_unaudited and o.audited == False:
+            raise AbortParseRecord("not audited")
         if o.source != "manual":
             raise AbortParseRecord("auto annotated")
         if not self.filepath(o).exists():
@@ -68,13 +71,10 @@ class VLPParser(Parser):
 
         record.detection.set_class_map(self.class_map)
         record.detection.add_labels_by_id(self.labels(o))
-        x, y = eval(o[3])
+        x, y = eval(o.license_plate_center)
         x *= imsize.width
         y *= imsize.height
-        if o.visible != o.visible:  # nan means not assigned in df
-            visible = 1.0
-        else:
-            visible = o.visible
+        visible = int(o.inframe)
         keypoints = [KeyPoints.from_xyv([x, y, visible], VLPKeypointsMetadata)]
         record.detection.add_keypoints(keypoints)
 
