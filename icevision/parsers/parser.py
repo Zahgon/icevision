@@ -84,8 +84,8 @@ class Parser(ParserInterface, ABC):
 
         for sample in pbar(self, show_pbar):
             try:
-                self.prepare(sample)
                 record_id = self.record_id(sample)
+                self.prepare(sample)
                 record = records.get_by_record_id(record_id)
                 self.parse_fields(sample, record=record, is_new=record.is_new)
 
