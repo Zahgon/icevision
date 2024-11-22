@@ -236,8 +236,8 @@ class AlbumentationsKeypointsComponent(AlbumentationsAdapterComponent):
                 v_n[i] = cls._check_kps_coords(tfms_kpts[i], size_no_padding)
                 if v_n[i] == 1:
                     v_n[i] = v[i]
-            if v_n[i] == 0:
-                tra_n[i] = (0, 0)
+            # if v_n[i] == 0:
+            #     tra_n[i] = (0, 0)
             tra_n[i] = (tra_n[i][0], tra_n[i][1], v_n[i])
         return tra_n
 
