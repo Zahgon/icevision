@@ -5,6 +5,7 @@ from torchvision.transforms.functional import to_tensor
 
 from icevision.models.custom.keypoints.heatmap_generator import KeypointHeatmapGenerator
 from icevision.models.utils import transform_dl
+from functools import partial
 
 
 def process_train_record(record) -> tuple:
@@ -19,7 +20,7 @@ def process_train_record(record) -> tuple:
     return image, bboxes
 
 
-def train_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
+def train_dl(dataset, point_ratio=32, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
     """A `DataLoader` with a custom `collate_fn` that batches items as required for training the model.
 
     # Arguments
@@ -33,13 +34,13 @@ def train_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
     """
     return transform_dl(
         dataset=dataset,
-        build_batch=build_train_batch,
+        build_batch=partial(build_train_batch, point_ratio=point_ratio),
         batch_tfms=batch_tfms,
         **dataloader_kwargs
     )
 
 
-def valid_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
+def valid_dl(dataset, point_ratio=32, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
     """A `DataLoader` with a custom `collate_fn` that batches items as required for validating the model.
 
     # Arguments
@@ -53,12 +54,12 @@ def valid_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
     """
     return transform_dl(
         dataset=dataset,
-        build_batch=build_valid_batch,
+        build_batch=partial(build_valid_batch, point_ratio=point_ratio),
         batch_tfms=batch_tfms,
         **dataloader_kwargs
     )
 
-def build_train_batch(records):
+def build_train_batch(records, point_ratio):
     """Builds a batch in the format required by the model when training.
 
     # Arguments
@@ -86,7 +87,7 @@ def build_train_batch(records):
         batch_images.append(to_tensor(record.img))
 
     heatmap_shape = record.img_size.height // 2, record.img_size.width // 2
-    hmgen = KeypointHeatmapGenerator(heatmap_shape)
+    hmgen = KeypointHeatmapGenerator(heatmap_shape, point_ratio=point_ratio)
     # convert to tensors
     batch_data = hmgen(np.array(batch_raw_keypoints))
     batch_images = torch.stack(batch_images)
@@ -94,7 +95,7 @@ def build_train_batch(records):
     return (batch_images, batch_data), records
 
 
-def build_valid_batch(records):
+def build_valid_batch(records, point_ratio):
     """Builds a batch in the format required by the model when validating.
 
     # Arguments
@@ -113,7 +114,7 @@ def build_valid_batch(records):
     outs = model(*batch)
     ```
     """
-    return build_train_batch(records)
+    return build_train_batch(records, point_ratio=point_ratio)
 
 
 def build_infer_batch(records):

@@ -45,8 +45,8 @@ def main():
     backbone = model_type.backbones.tf_efficientnet_b0
     model = model_type.model(backbone=backbone(pretrained=True), num_keypoints=1, use_visibility=True)
 
-    train_dl = model_type.train_dl(train_ds, batch_size=batch_size, num_workers=num_workers, shuffle=True)
-    valid_dl = model_type.valid_dl(valid_ds, batch_size=batch_size, num_workers=num_workers, shuffle=False)
+    train_dl = model_type.train_dl(train_ds, point_ratio=cfg.model.point_ratio, batch_size=batch_size, num_workers=num_workers, shuffle=True)
+    valid_dl = model_type.valid_dl(valid_ds, point_ratio=cfg.model.point_ratio, batch_size=batch_size, num_workers=num_workers, shuffle=False)
 
     logger = L.loggers.WandbLogger(
         project="icevision-2.0-keypoints",

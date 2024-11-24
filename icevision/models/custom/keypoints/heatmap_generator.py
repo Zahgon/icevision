@@ -3,7 +3,7 @@ import numpy as np
 
 
 class KeypointHeatmapGenerator:
-    def __init__(self, output_size):
+    def __init__(self, output_size, point_ratio=32):
         """
         Initialize heatmap generator
 
@@ -13,7 +13,7 @@ class KeypointHeatmapGenerator:
         """
         self.output_size = output_size
         h, w = output_size
-        self.sigma = w // 32
+        self.sigma = w // point_ratio
         self.generate_gaussian_kernel()
 
     def generate_gaussian_kernel(self):
