@@ -159,5 +159,7 @@ checkpoints
 
 wandb
 wandb/*
+outputs/*
+examples/outputs
 
 */artifacts/*
