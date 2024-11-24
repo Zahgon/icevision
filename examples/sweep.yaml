@@ -1,0 +1,19 @@
+program: train_keypoints.py
+project: icevision-2.0-keypoints
+method: grid
+metric:
+  goal: maximize
+  name: KeypointMetrics/PCK@0.05
+parameters:
+  model.loss_cfg.smooth_scale:
+    values: [10.0, 50.0, 100.0]
+  model.loss_cfg.dice_scale:
+    values: [0.1, 1.0]
+  model.point_ratio:
+    values: [32, 64, 96, 128]
+
+command:
+  - ${env}
+  - python
+  - ${program}
+  - ${args_no_hyphens}
