@@ -10,6 +10,8 @@ from icevision.metrics import Metric
 from icevision.metrics.keypoints.keypoint_metrics import KeypointMetrics
 from icevision.models.custom import keypoints
 from icevision.utils.schedulers import WarmupCosineScheduler
+from omegaconf import DictConfig, OmegaConf
+
 
 
 class ModelAdapter(LightningModelAdapter, ABC):
@@ -26,13 +28,11 @@ class ModelAdapter(LightningModelAdapter, ABC):
         A `LightningModule`.
     """
 
-    def __init__(self, model: nn.Module, learning_rate: float = 1e-4, torch_compile: bool = True, ignore_invisible: bool = True):
+    def __init__(self, model: nn.Module, learning_rate: float = 1e-4, torch_compile: bool = True, loss_cfg: DictConfig = {}):
         super().__init__(metrics=[KeypointMetrics()])
         self.model = model
-        # self.loss_fn = keypoints.KeypointLoss()
-        # self.loss_fn = keypoints.JointsMSELoss()
-        self.loss_fn = keypoints.KeypointHeatmapLoss(ignore_invisible=ignore_invisible)
-        self.save_hyperparameters("learning_rate", "torch_compile", "ignore_invisible")
+        self.loss_fn = keypoints.KeypointHeatmapLoss(**loss_cfg)
+        self.save_hyperparameters("learning_rate", "torch_compile")
 
     def configure_optimizers(self):
         warmup_epochs = max(int(0.05 * self.hparams.max_epochs), 2)

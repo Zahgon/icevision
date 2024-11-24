@@ -13,37 +13,40 @@ from icevision.models.utils import freeze, unfreeze
 from icevision.parsers.vlp_parser import VLPParser
 from icevision import tfms
 from icevision.visualize.show_data import show_samples
+from omegaconf import DictConfig, OmegaConf
+import hydra
 
-def main():
+
+@hydra.main(config_path="conf", config_name="config")
+def main(cfg: DictConfig) -> None:
+    print(OmegaConf.to_yaml(cfg))
+
     # hparams
-    use_heavy_augs = False
-    learning_rate = 1e-4
-    max_epochs = 100
 
     image_size = 384
     batch_size = 32
     num_workers = 6
 
-    skip_unaudited = True
     torch_compile = False
-    ignore_invisible = True
 
-    data_dir = Path.home() / "datasets/plate_localization/v2.2"
-    parser = VLPParser(annotations_filepath=data_dir / "metadata.csv", skip_unaudited=skip_unaudited)
+    parser = VLPParser(data_dir=Path(cfg.dataset.path), skip_unaudited=cfg.dataset.skip_unaudited)
 
-    train_records, valid_records = parser.parse(data_splitter=FolderSplitter(["train", "val"]), cache_filepath=data_dir/"cache_audited")
+    train_records, valid_records = parser.parse(
+        data_splitter=FolderSplitter(["train", "val"]), 
+        cache_filepath=Path(cfg.dataset.path)/cfg.dataset.cache if cfg.dataset.cache is not None else None
+    )
 
     # Create the parser
-    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=512, crop_fn=None, include_heavy=use_heavy_augs), tfms.A.Normalize()])
+    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=512, crop_fn=None, include_heavy=cfg.training.use_heavy_augs), tfms.A.Normalize()])
     valid_tfms = tfms.A.Adapter([*tfms.A.resize_and_pad(image_size), tfms.A.Normalize()])
 
     # Datasets
-    train_ds = Dataset(valid_records, train_tfms)
-    valid_ds = Dataset(train_records, valid_tfms)
+    train_ds = Dataset(train_records, train_tfms)
+    valid_ds = Dataset(valid_records, valid_tfms)
 
     model_type = models.custom.keypoints
-    backbone = model_type.backbones.tf_efficientnet_b0
-    model = model_type.model(backbone=backbone(pretrained=True), num_keypoints=1, use_visibility=True)
+    backbone = getattr(model_type.backbones, cfg.model.backbone)
+    model = model_type.model(backbone=backbone(pretrained=cfg.model.pretrained), num_keypoints=cfg.model.num_keypoints, use_visibility=cfg.model.use_visibility, use_fpn=cfg.model.use_fpn)
 
     train_dl = model_type.train_dl(train_ds, point_ratio=cfg.model.point_ratio, batch_size=batch_size, num_workers=num_workers, shuffle=True)
     valid_dl = model_type.valid_dl(valid_ds, point_ratio=cfg.model.point_ratio, batch_size=batch_size, num_workers=num_workers, shuffle=False)
@@ -51,18 +54,18 @@ def main():
     logger = L.loggers.WandbLogger(
         project="icevision-2.0-keypoints",
         group="v2.2",
-        notes=f"{backbone.model_name} + dice loss",
+        notes=f"{cfg.model.backbone} + scales 10/1/10",
         tags=["fp16", str(image_size)]
     )
 
     # logger = None
 
     # ckpt_path = "/home/ppotrykus/Programs/icevision/icevision-2.0-keypoints/92yzbaf1/checkpoints/042350_loss=0.00_PCK@0.1=0.847.ckpt"
-    # light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model, torch_compile=torch_compile, ignore_invisible=ignore_invisible)
+    # light_model = model_type.lightning.ModelAdapter.load_from_checkpoint(ckpt_path, model=model, torch_compile=torch_compile)
     # freeze(light_model.model.parameters())
     # unfreeze(light_model.model.visibility_head.parameters())
 
-    light_model = model_type.lightning.ModelAdapter(model, learning_rate=learning_rate, torch_compile=torch_compile, ignore_invisible=ignore_invisible)
+    light_model = model_type.lightning.ModelAdapter(model, learning_rate=cfg.training.learning_rate, torch_compile=torch_compile)
 
     callbacks = [
         L.callbacks.ModelSummary(max_depth=2),
@@ -79,7 +82,7 @@ def main():
     ]
     trainer = L.Trainer(
         accelerator='gpu',
-        max_epochs=max_epochs,
+        max_epochs=cfg.training.max_epochs,
         logger=logger,
         callbacks=callbacks,
         # enable_checkpointing=False,
@@ -89,9 +92,6 @@ def main():
 
     )
     trainer.fit(light_model, train_dl, valid_dl)
-    #
-    # model_type.show_results(model, valid_ds, detection_threshold=0.5)
-    # plt.show()
 
 
 if __name__ == "__main__":

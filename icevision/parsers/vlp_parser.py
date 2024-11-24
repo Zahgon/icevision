@@ -21,10 +21,10 @@ class VLPKeypointsMetadata(KeypointsMetadata):
 
 
 class VLPParser(Parser):
-    def __init__(self, annotations_filepath, idmap=None, skip_unaudited=False):
+    def __init__(self, data_dir: Path, idmap=None, skip_unaudited=False):
         super().__init__(template_record=self.template_record(), idmap=idmap)
-        self.annotations = pd.read_csv(annotations_filepath)
-        self.img_dir = Path(annotations_filepath.parent) / "images"
+        self.annotations = pd.read_csv(data_dir/"metadata.csv")
+        self.img_dir = data_dir / "images"
         self.class_map = ClassMap(VLPKeypointsMetadata.labels)
         self.skip_unaudited = skip_unaudited
 

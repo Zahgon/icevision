@@ -63,41 +63,41 @@ class JointsMSELoss(nn.Module):
 
 
 class WeightedDiceLoss(nn.Module):
-    def __init__(self, smooth=1.0):
+    def __init__(self):
         super(WeightedDiceLoss, self).__init__()
-        self.smooth = smooth
+        self.binarize_target = True
 
-    def forward(self, predictions, targets, visibility, weights=None):
+    def forward(self, predictions, targets, visibility):
         """
         Calculate Weighted Dice Loss for continuous heatmap values
         Args:
             predictions (torch.Tensor): Predicted heatmap (B, C, H, W)
             targets (torch.Tensor): Target heatmap (B, C, H, W)
             visibility (torch.Tensor, optional): sample visibility (B, C)
-            weights (torch.Tensor, optional): Pixel-wise weights (B, C, H, W)
         """
         batch_size = predictions.size(0)
         predictions = predictions.view(batch_size, -1)
         targets = targets.view(batch_size, -1)
+        if self.binarize_target:
+            targets = torch.where(targets>0.0, 1.0, 0.0)
 
-        if weights is not None:
-            weights = weights.view(batch_size, -1)
-            intersection = (predictions * targets * weights).sum(dim=1)
-            union = (predictions * weights).sum(dim=1) + (targets * weights).sum(dim=1)
-        else:
-            intersection = (predictions * targets).sum(dim=1)
-            union = predictions.sum(dim=1) + targets.sum(dim=1)
+        intersection = (predictions * targets).sum(dim=1)
 
-        dice = (2. * intersection + self.smooth) / (union + self.smooth)
-        return 1 - (dice * visibility).mean()
+        weight = intersection / (targets * torch.where(predictions>0.0, 1.0, 0.0) + 1e-6).sum(dim=1)
+        weight = torch.where(weight > 0, weight, 1.0)
+
+        union = predictions.sum(dim=1) + targets.sum(dim=1) * weight
+
+        dice = (2. * intersection) / (union + 1e-6)
+        return 1 - (dice * visibility.view(-1)).mean()
 
 
 class KeypointHeatmapLoss(nn.Module):
     def __init__(self, ignore_invisible=True):
         super().__init__()
         self.ignore_invisible = ignore_invisible
-        self.smooth_scale = 100
-        self.dice_scale = 1/20
+        self.smooth_scale = 10
+        self.dice_scale = 1
         self.visibility_scale = 10
         self.focal_gamma = 2.0
         self.smooth_loss = nn.SmoothL1Loss(reduction='none', beta=0.1)

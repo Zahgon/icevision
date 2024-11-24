@@ -1,0 +1,25 @@
+dataset:
+  path: ${oc.env:HOME}/datasets/plate_localization/v2.2
+  cache: cache_all
+  skip_unaudited: False
+
+
+training:
+  max_epochs: 100
+  learning_rate: 1e-4
+  use_heavy_augs: False
+  
+
+model:
+  backbone: tf_efficientnet_b0
+  pretrained: True
+  num_keypoints: 1
+  use_visibility: True
+  use_fpn: True
+  point_ratio: 32  # size of keypoint relative to full map [32, 64, 96, 128]
+
+  loss_cfg:
+    ignore_invisible: True
+    smooth_scale: 10
+    dice_scale: 1
+    visibility_scale: 10
