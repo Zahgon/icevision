@@ -52,7 +52,7 @@ def main(cfg: DictConfig) -> None:
     valid_dl = model_type.valid_dl(valid_ds, point_ratio=cfg.model.point_ratio, batch_size=batch_size, num_workers=num_workers, shuffle=False)
 
     logger = L.loggers.WandbLogger(
-        config=cfg,
+        config=OmegaConf.to_yaml(cfg),
         offline=cfg.wandb.offline,
         project="icevision-2.0-keypoints",
         group="v2.2",
