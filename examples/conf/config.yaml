@@ -3,6 +3,8 @@ dataset:
   cache: cache_all
   skip_unaudited: False
 
+wandb:
+  offline: False
 
 training:
   max_epochs: 100
@@ -16,10 +18,11 @@ model:
   num_keypoints: 1
   use_visibility: True
   use_fpn: True
-  point_ratio: 32  # size of keypoint relative to full map [32, 64, 96, 128]
+  point_ratio: 128  # size of keypoint relative to full map [32, 64, 96, 128]
 
   loss_cfg:
     ignore_invisible: True
-    smooth_scale: 10
-    dice_scale: 1
-    visibility_scale: 10
+    smooth_scale: 10.0
+    dice_scale: 0.0
+    visibility_scale: 10.0
+    js_scale: 1.0
