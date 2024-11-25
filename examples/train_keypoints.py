@@ -52,9 +52,11 @@ def main(cfg: DictConfig) -> None:
     valid_dl = model_type.valid_dl(valid_ds, point_ratio=cfg.model.point_ratio, batch_size=batch_size, num_workers=num_workers, shuffle=False)
 
     logger = L.loggers.WandbLogger(
+        config=cfg,
+        offline=cfg.wandb.offline,
         project="icevision-2.0-keypoints",
         group="v2.2",
-        notes=f"{cfg.model.backbone} + scales 10/1/10",
+        notes=f"{cfg.model.backbone} + add js loss",
         tags=["fp16", str(image_size)]
     )
 
@@ -65,7 +67,7 @@ def main(cfg: DictConfig) -> None:
     # freeze(light_model.model.parameters())
     # unfreeze(light_model.model.visibility_head.parameters())
 
-    light_model = model_type.lightning.ModelAdapter(model, learning_rate=cfg.training.learning_rate, torch_compile=torch_compile)
+    light_model = model_type.lightning.ModelAdapter(model, learning_rate=cfg.training.learning_rate, torch_compile=torch_compile, loss_cfg=cfg.model.loss_cfg)
 
     callbacks = [
         L.callbacks.ModelSummary(max_depth=2),

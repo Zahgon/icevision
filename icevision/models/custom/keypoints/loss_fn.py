@@ -93,15 +93,19 @@ class WeightedDiceLoss(nn.Module):
 
 
 class KeypointHeatmapLoss(nn.Module):
-    def __init__(self, ignore_invisible=True):
+    def __init__(self, ignore_invisible=True, smooth_scale=10.0, dice_scale=1.0, visibility_scale=10.0, js_scale: float = 1.0):
         super().__init__()
         self.ignore_invisible = ignore_invisible
-        self.smooth_scale = 10
-        self.dice_scale = 1
-        self.visibility_scale = 10
         self.focal_gamma = 2.0
+
+        self.smooth_scale = smooth_scale
+        self.dice_scale = dice_scale
+        self.visibility_scale = visibility_scale
+        self.js_scale = js_scale
+
         self.smooth_loss = nn.SmoothL1Loss(reduction='none', beta=0.1)
         self.dice_loss = WeightedDiceLoss()
+        self.js_loss = js_divergence
 
     def forward(self, pred_in, target_in):
         """
@@ -126,6 +130,7 @@ class KeypointHeatmapLoss(nn.Module):
 
         # compute dice loss
         dice_loss = self.dice_loss(pred, target, visibility=target_visibility)
+        js_loss = self.js_loss(pred, target)
 
         # step 1: Class weights
         neg_ratio = 1 - target_visibility.mean()
@@ -144,5 +149,29 @@ class KeypointHeatmapLoss(nn.Module):
 
         visibility_loss = (weighted_visibility_loss * focal_weight).mean()
 
-        total_loss = smooth_loss * self.smooth_scale + visibility_loss * self.visibility_scale + dice_loss * self.dice_scale
-        return dict(loss=total_loss, heatmap_loss=smooth_loss, visibility_loss=visibility_loss, dice_loss=dice_loss)
+        total_loss = smooth_loss * self.smooth_scale
+        total_loss += visibility_loss * self.visibility_scale 
+        total_loss += dice_loss * self.dice_scale
+        total_loss += js_loss * self.js_scale
+        return dict(loss=total_loss, heatmap_loss=smooth_loss, visibility_loss=visibility_loss, dice_loss=dice_loss, js_loss=js_loss)
+
+def js_divergence(p, q, epsilon=1e-7):
+    """
+    Compute Jensen-Shannon divergence between two heatmaps.
+    Args:
+        p: predicted heatmap tensor
+        q: target heatmap tensor
+        epsilon: small constant to avoid log(0)
+    """
+    # Ensure inputs are properly normalized
+    p = p / (p.sum() + epsilon)
+    q = q / (q.sum() + epsilon)
+    
+    # Calculate the middle point distribution
+    m = 0.5 * (p + q)
+    
+    # Calculate JS divergence
+    js = 0.5 * torch.sum(p * torch.log((p + epsilon) / (m + epsilon))) + \
+         0.5 * torch.sum(q * torch.log((q + epsilon) / (m + epsilon)))
+    
+    return js
