@@ -7,18 +7,19 @@ wandb:
   offline: False
 
 training:
-  max_epochs: 100
+  max_epochs: 300
   learning_rate: 1e-4
   use_heavy_augs: False
   
 
 model:
   backbone: tf_efficientnet_b0
+  input_size: 384
   pretrained: True
   num_keypoints: 1
   use_visibility: True
   use_fpn: True
-  point_ratio: 128  # size of keypoint relative to full map [32, 64, 96, 128]
+  point_ratio: 32  # size of keypoint relative to full map [32, 64, 96, 128]
 
   loss_cfg:
     ignore_invisible: True

@@ -22,8 +22,7 @@ def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
     # hparams
-
-    image_size = 384
+    presize = max(512, cfg.model.input_size)
     batch_size = 32
     num_workers = 6
 
@@ -37,8 +36,8 @@ def main(cfg: DictConfig) -> None:
     )
 
     # Create the parser
-    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=image_size, presize=512, crop_fn=None, include_heavy=cfg.training.use_heavy_augs), tfms.A.Normalize()])
-    valid_tfms = tfms.A.Adapter([*tfms.A.resize_and_pad(image_size), tfms.A.Normalize()])
+    train_tfms = tfms.A.Adapter([*tfms.A.aug_tfms(size=cfg.model.input_size, presize=presize, crop_fn=None, include_heavy=cfg.training.use_heavy_augs), tfms.A.Normalize()])
+    valid_tfms = tfms.A.Adapter([*tfms.A.resize_and_pad(cfg.model.input_size), tfms.A.Normalize()])
 
     # Datasets
     train_ds = Dataset(train_records, train_tfms)
@@ -57,7 +56,7 @@ def main(cfg: DictConfig) -> None:
         project="icevision-2.0-keypoints",
         group="v2.2",
         notes=f"{cfg.model.backbone} + add js loss",
-        tags=["fp16", str(image_size)]
+        tags=["fp16", str(cfg.model.input_size), cfg.model.backbone]
     )
 
     # logger = None
