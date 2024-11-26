@@ -5,12 +5,14 @@ metric:
   goal: maximize
   name: KeypointMetrics/PCK@0.05
 parameters:
-  model.loss_cfg.smooth_scale:
-    values: [10.0, 100.0]
-  model.loss_cfg.js_scale:
-    values: [0.1, 1.0]
   model.point_ratio:
-    values: [32, 128]
+    values: [32, 64]
+  model.input_size:
+    values: [384, 512, 768]
+  model.backbone:
+    values: 
+      - tf_efficientnet_b0
+      - tf_efficientnet_b2
 
 command:
   - ${env}
