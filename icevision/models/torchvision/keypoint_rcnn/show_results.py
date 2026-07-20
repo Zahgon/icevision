@@ -27,17 +27,7 @@ def show_results(
     show: bool = True,
     device: Optional[torch.device] = None,
 ) -> None:
-    return base_show_results(
-        predict_fn=predict,
-        model=model,
-        dataset=dataset,
-        num_samples=num_samples,
-        ncols=ncols,
-        denormalize_fn=denormalize_fn,
-        show=show,
-        detection_threshold=detection_threshold,
-        device=device,
-    )
+    pass
 
 
 _LOSSES_DICT = {

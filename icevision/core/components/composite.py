@@ -32,7 +32,6 @@ class TaskComposite:
         if name == "task_composites":
             raise AttributeError(name)
 
-        # TODO: Possible bug if no task with _default is passed
         try:
             return getattr(self.task_composites[tasks.common.name], name)
         except AttributeError:
@@ -50,15 +49,10 @@ class TaskComposite:
         self.set_task_components(self.components)
 
     def remove_component_by_type(self, component_type: TaskComponent):
-        for component in self.components:
-            if isinstance(component, component_type):
-                break
-        self.components.remove(component)
-        self.set_task_components(self.components)
+        pass
 
     def set_task_components(self, components: Sequence[TaskComponent]):
         task_components = defaultdict(list)
-        # example: task_components['detect'] = (LabelsComponent, BBoxesComponent, ...)
         for component in components:
             task_components[component.task].append(component)
 
@@ -71,7 +65,6 @@ class TaskComposite:
             if task != tasks.common:
                 composite.set_parent(self)
 
-    # TODO: rename reduce_on_all_tasks_components
     def reduce_on_components(
         self,
         fn_name: str,
@@ -107,16 +100,13 @@ class Composite:
         self.set_components(components)
 
     def __getattr__(self, name):
-        # avoid recursion https://nedbatchelder.com/blog/201010/surprising_getattr_recursion.html
         if name in ["components", "_parent"]:
             raise AttributeError(name)
-        # delegates attributes to components
         for component in self.components:
             try:
                 return getattr(component, name)
             except AttributeError:
                 pass
-        # delegates attributes to parent
         try:
             return getattr(self._parent, name)
         except AttributeError:
@@ -141,9 +131,7 @@ class Composite:
         return out
 
     def get_component_by_type(self, component_type) -> Union[Component, None]:
-        for component in self.components:
-            if isinstance(component, component_type):
-                return component
+        pass
 
     def add_component(self, component):
         self.add_components([component])

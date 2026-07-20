@@ -43,19 +43,8 @@ def model(
         **kwargs,
     )
 
-    # TODO: Break down param groups for backbone
     def param_groups_fn(model: nn.Module) -> List[List[nn.Parameter]]:
-        unwrapped = unwrap_bench(model)
-
-        layers = [
-            unwrapped.backbone,
-            unwrapped.fpn,
-            nn.Sequential(unwrapped.class_net, unwrapped.box_net),
-        ]
-        param_groups = [list(layer.parameters()) for layer in layers]
-        check_all_model_params_in_groups2(model, param_groups)
-
-        return param_groups
+        pass
 
     model_bench.param_groups = MethodType(param_groups_fn, model_bench)
 

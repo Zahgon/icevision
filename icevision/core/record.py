@@ -7,12 +7,11 @@ from icevision.core.components import *
 from icevision.core.record_components import *
 
 
-# TODO: Rename to Record
 class BaseRecord(TaskComposite):
     base_components = {RecordIDRecordComponent, SizeRecordComponent}
 
     def as_dict(self) -> dict:
-        return self.reduce_on_components("as_dict", reduction="update")
+        pass
 
     def num_annotations(self) -> Dict[str, dict]:
         return self.reduce_on_components("_num_annotations", reduction="update")
@@ -53,14 +52,12 @@ class BaseRecord(TaskComposite):
 
         return tasks_success_dict
 
-    # TODO: Might have weird interaction with task_components
     def remove_annotation(self, i: int, task_name: str):
         self.reduce_on_task_components("_remove_annotation", task_name=task_name, i=i)
 
     def aggregate_objects(self):
-        return self.reduce_on_components("_aggregate_objects", reduction="update")
+        pass
 
-    # Instead of copying here, copy outside?
     def load(self) -> "BaseRecord":
         record = deepcopy(self)
         record.reduce_on_components("_load")
@@ -70,17 +67,16 @@ class BaseRecord(TaskComposite):
         self.reduce_on_components("_unload")
 
     def setup_transform(self, tfm):
-        self.reduce_on_components("setup_transform", tfm=tfm)
+        pass
 
     def builder_template(self) -> List[str]:
-        res = self.reduce_on_components("builder_template", reduction="extend").values()
-        return [line for lines in res for line in lines]
+        pass
 
     def __repr__(self) -> str:
         tasks_reprs = self.reduce_on_components("_repr", reduction="extend")
 
         def join_one(reprs):
-            return "".join(f"\n\t- {o}" for o in reprs)
+            pass
 
         reprs = [f"{task}: {join_one(reprs)}" for task, reprs in tasks_reprs.items()]
         repr = "\n".join(reprs)

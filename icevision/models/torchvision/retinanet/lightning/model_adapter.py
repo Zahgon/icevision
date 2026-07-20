@@ -5,18 +5,6 @@ from icevision.models.torchvision.retinanet.prediction import *
 
 
 class ModelAdapter(RCNNModelAdapter):
-    """Lightning module specialized for retinanet, with metrics support.
-
-    The methods `forward`, `training_step`, `validation_step`, `validation_epoch_end`
-    are already overriden.
-
-    # Arguments
-        model: The pytorch model to use.
-        metrics: `Sequence` of metrics to use.
-
-    # Returns
-        A `LightningModule`.
-    """
 
     def convert_raw_predictions(self, batch, raw_preds, records):
         return convert_raw_predictions(

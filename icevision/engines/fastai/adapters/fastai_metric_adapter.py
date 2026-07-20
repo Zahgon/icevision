@@ -13,15 +13,12 @@ class FastaiMetricAdapter(fastai.Metric):
         pass
 
     def accumulate(self, learn: fastai.Learner):
-        self.metric.accumulate(preds=learn.converted_preds)
+        pass
 
     @property
     def value(self) -> Dict[str, float]:
-        # return self.metric.finalize()
-        # HACK: Return single item from dict
-        logs = self.metric.finalize()
-        return next(iter(logs.values()))
+        pass
 
     @property
     def name(self) -> str:
-        return self.metric.name
+        pass

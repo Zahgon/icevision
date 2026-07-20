@@ -31,7 +31,6 @@ class COCOBaseParser(Parser):
         categories = self.annotations_dict["categories"]
         id2class = {o["id"]: o["name"] for o in categories}
         id2class[0] = BACKGROUND
-        # coco has non sequential ids, we fill the blanks with `None`, check #668 for more info
         classes = [None for _ in range(max(id2class.keys()) + 1)]
         for i, name in id2class.items():
             classes[i] = name
@@ -46,110 +45,76 @@ class COCOBaseParser(Parser):
         return len(self.annotations_dict["annotations"])
 
     def template_record(self) -> BaseRecord:
-        return BaseRecord(
-            (
-                FilepathRecordComponent(),
-                InstancesLabelsRecordComponent(),
-                AreasRecordComponent(),
-                IsCrowdsRecordComponent(),
-            )
-        )
+        pass
 
     def prepare(self, o):
-        self._info = self._record_id2info[o["image_id"]]
+        pass
 
     def record_id(self, o) -> int:
-        return o["image_id"]
+        pass
 
     def filepath(self, o) -> Path:
-        return self.img_dir / self._info["file_name"]
+        pass
 
     def img_size(self, o) -> ImgSize:
-        return get_img_size(self.filepath(o))
+        pass
 
     def labels_ids(self, o) -> List[Hashable]:
-        return [o["category_id"]]
+        pass
 
     def areas(self, o) -> List[float]:
-        return [o["area"]]
+        pass
 
     def iscrowds(self, o) -> List[bool]:
-        return [o["iscrowd"]]
+        pass
 
     def parse_fields(self, o, record, is_new):
-        if is_new:
-            record.set_filepath(self.filepath(o))
-            record.set_img_size(self.img_size(o))
-
-        # TODO: is class_map still a issue here?
-        record.detection.set_class_map(self.class_map)
-        record.detection.add_labels_by_id(self.labels_ids(o))
-        record.detection.add_areas(self.areas(o))
-        record.detection.add_iscrowds(self.iscrowds(o))
+        pass
 
 
 class COCOBBoxParser(COCOBaseParser):
     def bboxes(self, o) -> List[BBox]:
-        return [BBox.from_xywh(*o["bbox"])]
+        pass
 
     def template_record(self) -> BaseRecord:
-        record = super().template_record()
-        record.add_component(BBoxesRecordComponent())
-        return record
+        pass
 
     def parse_fields(self, o, record, is_new):
-        super().parse_fields(o, record, is_new=is_new)
-        record.detection.add_bboxes(self.bboxes(o))
+        pass
 
 
 class COCOMaskParser(COCOBBoxParser):
     def masks(self, o) -> List[MaskArray]:
-        seg = o["segmentation"]
-        if o["iscrowd"]:
-            return [RLE.from_coco(seg["counts"])]
-        else:
-            return [Polygon(seg)]
+        pass
 
     def template_record(self) -> BaseRecord:
-        record = super().template_record()
-        record.add_component(InstanceMasksRecordComponent())
-        return record
+        pass
 
     def parse_fields(self, o, record, is_new):
-        super().parse_fields(o, record, is_new=is_new)
-        record.detection.add_masks(self.masks(o))
+        pass
 
 
 class COCOKeyPointsParser(COCOBBoxParser):
     def template_record(self) -> BaseRecord:
-        record = super().template_record()
-        record.add_component(KeyPointsRecordComponent())
-        return record
+        pass
 
     def keypoints(self, o) -> List[KeyPoints]:
-        return (
-            [KeyPoints.from_xyv(o["keypoints"], COCOKeypointsMetadata)]
-            if sum(o["keypoints"]) > 0
-            else []
-        )
+        pass
 
     def labels_ids(self, o) -> List[Hashable]:
-        if sum(o["keypoints"]) <= 0:
-            return []
-        return super().labels_ids(o)
+        pass
 
     def areas(self, o) -> List[float]:
-        return [o["area"]] if sum(o["keypoints"]) > 0 else []
+        pass
 
     def iscrowds(self, o) -> List[bool]:
-        return [o["iscrowd"]] if sum(o["keypoints"]) > 0 else []
+        pass
 
     def bboxes(self, o) -> List[BBox]:
-        return [BBox.from_xywh(*o["bbox"])] if sum(o["keypoints"]) > 0 else []
+        pass
 
     def parse_fields(self, o, record, is_new):
-        super().parse_fields(o, record, is_new=is_new)
-        record.detection.add_keypoints(self.keypoints(o))
+        pass
 
 
 class COCOConnectionsColor:

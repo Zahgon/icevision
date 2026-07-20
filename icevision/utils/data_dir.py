@@ -10,7 +10,7 @@ data_dir.mkdir(exist_ok=True)
 
 
 def get_data_dir():
-    return data_dir
+    pass
 
 
 def get_root_dir():

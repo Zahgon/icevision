@@ -15,9 +15,8 @@ def convert_dataloader_to_fastai(dataloader: DataLoader):
 
     class FastaiDataLoaderWithCollate(fastai.DataLoader):
         def create_batch(self, b):
-            return (dataloader.collate_fn, raise_error_convert)[self.prebatched](b)
+            pass
 
-    # use the type of sampler to determine if shuffle is true or false
     if isinstance(dataloader.sampler, (SequentialSampler, _InfiniteConstantSampler)):
         shuffle = False
     elif isinstance(dataloader.sampler, RandomSampler):

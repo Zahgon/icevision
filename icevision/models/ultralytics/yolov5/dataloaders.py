@@ -39,7 +39,6 @@ def _build_train_sample(
 
     image = im2tensor(record.img)
 
-    # If no labels and bboxes are present, use as negative samples
     if len(record.detection.label_ids) == 0:
         target = torch.zeros((0, 6))
     else:
@@ -61,35 +60,7 @@ def _build_train_sample(
 def build_train_batch(
     records: Sequence[RecordType],
 ) -> Tuple[List[torch.Tensor], List[Dict[str, torch.Tensor]]]:
-    """Builds a batch in the format required by the model when training.
-
-    # Arguments
-        records: A `Sequence` of records.
-
-    # Returns
-        A tuple with two items. The first will be a tuple like `(images, targets)`,
-        in the input format required by the model. The second will be an updated list
-        of the input records.
-
-    # Examples
-
-    Use the result of this function to feed the model.
-    ```python
-    batch, records = build_train_batch(records)
-    outs = model(*batch)
-    ```
-    """
-    images, targets = [], []
-    for i, record in enumerate(records):
-        image, target = _build_train_sample(record)
-        images.append(image)
-
-        if target.numel() > 0:
-            target[:, 0] = i
-
-        targets.append(target)
-
-    return (torch.stack(images, 0), torch.cat(targets, 0)), records
+    pass
 
 
 def valid_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
@@ -115,25 +86,7 @@ def valid_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
 def build_valid_batch(
     records: List[RecordType],
 ) -> Tuple[List[torch.Tensor], Dict[str, torch.Tensor]]:
-    """Builds a batch in the format required by the model when validating.
-
-    # Arguments
-        records: A `Sequence` of records.
-
-    # Returns
-        A tuple with two items. The first will be a tuple like `(images, targets)`,
-        in the input format required by the model. The second will be an updated list
-        of the input records.
-
-    # Examples
-
-    Use the result of this function to feed the model.
-    ```python
-    batch, records = build_valid_batch(records)
-    outs = model(*batch)
-    ```
-    """
-    return build_train_batch(records=records)
+    pass
 
 
 def infer_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:

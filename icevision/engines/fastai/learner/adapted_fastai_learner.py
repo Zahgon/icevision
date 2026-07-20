@@ -7,7 +7,6 @@ from icevision.engines.fastai.imports import *
 from icevision.engines.fastai.adapters import *
 
 
-# TODO: param_groups fix for efficientdet
 def adapted_fastai_learner(
     dls: List[Union[DataLoader, fastai.DataLoader]],
     model: nn.Module,
@@ -16,10 +15,8 @@ def adapted_fastai_learner(
     splitter=None,
     **learner_kwargs,
 ) -> fastai.Learner:
-    # convert dataloaders to fastai
     fastai_dls = convert_dataloaders_to_fastai(dls=dls, device=device)
 
-    # convert metrics to fastai
     metrics = metrics or []
     fastai_metrics = [
         FastaiMetricAdapter(metric) if isinstance(metric, Metric) else metric
@@ -30,7 +27,7 @@ def adapted_fastai_learner(
         if hasattr(model, "param_groups"):
 
             def splitter(model):
-                return model.param_groups()
+                pass
 
         else:
             raise ValueError(

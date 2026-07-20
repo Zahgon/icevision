@@ -23,16 +23,7 @@ class LightningModelAdapter(pl.LightningModule, ABC):
         ]
 
     def accumulate_metrics(self, preds):
-        for metric in self.metrics:
-            metric.accumulate(preds=preds)
+        pass
 
     def finalize_metrics(self) -> None:
-        for metric in self.metrics:
-            metric_logs = metric.finalize()
-            for k, v in metric_logs.items():
-                for entry in self.metrics_keys_to_log_to_prog_bar:
-                    if entry[0] == k:
-                        self.log(entry[1], v, prog_bar=True)
-                        self.log(f"{metric.name}/{k}", v)
-                    else:
-                        self.log(f"{metric.name}/{k}", v)
+        pass

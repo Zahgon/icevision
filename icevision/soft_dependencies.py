@@ -5,13 +5,7 @@ from typing import *
 
 
 def soft_import(name: str):
-    try:
-        importlib.import_module(name)
-        return True
-    except ModuleNotFoundError as e:
-        if str(e) != f"No module named '{name}'":
-            raise e
-        return False
+    pass
 
 
 class _SoftDependencies:
@@ -29,7 +23,7 @@ class _SoftDependencies:
         self.fiftyone = soft_import("fiftyone")
 
     def check(self) -> Dict[str, bool]:
-        return self.__dict__.copy()
+        pass
 
 
 SoftDependencies = _SoftDependencies()

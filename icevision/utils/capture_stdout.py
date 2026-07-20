@@ -5,9 +5,6 @@ from io import StringIO
 
 
 class CaptureStdout(list):
-    """Capture the stdout (like prints)
-    From: https://stackoverflow.com/a/16571630/6772672
-    """
 
     def __init__(self, propagate_stdout: bool = False):
         self.propagate_stdout = propagate_stdout

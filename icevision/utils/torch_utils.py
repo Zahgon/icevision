@@ -12,7 +12,7 @@ from icevision.imports import *
 
 
 def to_np(t):
-    return t.detach().cpu().numpy()
+    pass
 
 
 def tensor_to_image(t: Tensor) -> np.ndarray:
@@ -20,7 +20,7 @@ def tensor_to_image(t: Tensor) -> np.ndarray:
 
 
 def requires_grad(model, layer):
-    return list(model.parameters())[layer].requires_grad
+    pass
 
 
 def model_device(model):
@@ -28,7 +28,7 @@ def model_device(model):
 
 
 def params(m):
-    return list(m.parameters())
+    pass
 
 
 def check_all_model_params_in_groups2(

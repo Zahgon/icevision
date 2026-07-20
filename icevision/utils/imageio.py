@@ -12,25 +12,14 @@ from PIL import ExifTags
 
 ImgSize = namedtuple("ImgSize", "width,height")
 
-# get exif tag
 for _EXIF_ORIENTATION_TAG in ExifTags.TAGS.keys():
     if PIL.ExifTags.TAGS[_EXIF_ORIENTATION_TAG] == "Orientation":
         break
 
-# from enum import Enum
 
-# class PILMode(Enum):
-#     blah
 
-# FIXME
 def open_img(fn, gray=False, ignore_exif: bool = False) -> PIL.Image.Image:
-    "Open an image from disk `fn` as a PIL Image"
-    color = "L" if gray else "RGB"
-    image = PIL.Image.open(str(fn))
-    if not ignore_exif:
-        image = PIL.ImageOps.exif_transpose(image)
-    image = image.convert(color)
-    return image
+    pass
 
 
 def open_gray_scale_image(fn):
@@ -41,48 +30,16 @@ def open_gray_scale_image(fn):
     return img
 
 
-# TODO: Deprecated
 def get_image_size(filepath: Union[str, Path]) -> Tuple[int, int]:
-    """
-    Returns image (width, height)
-    """
-    logger.warning("get_image_size is deprecated, use get_img_size instead")
-    image_size = get_img_size(filepath=filepath)
-    return image_size.width, image_size.height
+    pass
 
 
 def get_img_size(filepath: Union[str, Path]) -> ImgSize:
-    """
-    Returns image (width, height)
-    """
-    with PIL.Image.open(filepath) as image:
-        image_size = image.size
-
-    try:
-        exif = image._getexif()
-        if exif is not None and exif[_EXIF_ORIENTATION_TAG] in [6, 8]:
-            image_size = image_size[::-1]
-    except (AttributeError, KeyError, IndexError):
-        # cases: image don't have getexif
-        pass
-
-    return ImgSize(*image_size)
+    pass
 
 
 def show_img(img, ax=None, show: bool = False, **kwargs):
-    img = img.squeeze().copy()
-    cmap = "gray" if len(img.shape) == 2 else None
-
-    if ax is None:
-        fig, ax = plt.subplots(**kwargs)
-
-    ax.imshow(img, cmap=cmap)
-    ax.set_axis_off()
-
-    if show:
-        plt.show()
-
-    return ax
+    pass
 
 
 def plot_grid(

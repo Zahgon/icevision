@@ -27,30 +27,15 @@ def show_results(
     show: bool = True,
     device: Optional[torch.device] = None,
 ) -> None:
-    return base_show_results(
-        predict_fn=predict,
-        model=model,
-        dataset=dataset,
-        num_samples=num_samples,
-        ncols=ncols,
-        denormalize_fn=denormalize_fn,
-        show=show,
-        detection_threshold=detection_threshold,
-        device=device,
-    )
+    pass
 
 
 def _rename_losses_effdet(loss):
-    loss["effdet_total_loss"] = loss["loss"]
-    _ = loss.pop("loss", None)
-    return loss
+    pass
 
 
 def _sum_losses_effdet(loss):
-    _loss = loss.copy()
-    _ = _loss.pop("effdet_total_loss", None)
-    loss["loss_total"] = sum(_loss.values())
-    return loss
+    pass
 
 
 _LOSSES_DICT = {

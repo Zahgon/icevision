@@ -32,44 +32,11 @@ def show_results(
     show: bool = True,
     device: Optional[torch.device] = None,
 ) -> None:
-    return base_show_results(
-        predict_fn=predict,
-        model=model,
-        dataset=dataset,
-        num_samples=num_samples,
-        ncols=ncols,
-        denormalize_fn=denormalize_fn,
-        show=show,
-        detection_threshold=detection_threshold,
-        nms_iou_threshold=nms_iou_threshold,
-        device=device,
-    )
+    pass
 
 
 def loop_yolo(dl, model, losses_stats, device):
-    samples_plus_losses = []
-    compute_loss = ComputeLoss(model)
-
-    with torch.no_grad():
-        for (x, y), sample in pbar(dl):
-            torch.manual_seed(0)
-            x, y = _move_to_device(x, y, device)
-            preds = model(x)
-            loss = compute_loss(preds, y)[0]
-            loss = {
-                "loss_yolo": float(loss.cpu().numpy()),
-                "loss_total": float(loss.cpu().numpy()),
-            }
-
-            for l in losses_stats.keys():
-                losses_stats[l].append(loss[l])
-
-            loss_comp = LossesRecordComponent()
-            loss_comp.set_losses(loss)
-            sample[0].add_component(loss_comp)
-            sample[0].set_img(tensor_to_image(x[0]))
-            samples_plus_losses.append(sample[0])
-    return samples_plus_losses, losses_stats
+    pass
 
 
 _LOSSES_DICT = {

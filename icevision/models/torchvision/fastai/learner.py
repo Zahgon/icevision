@@ -7,7 +7,7 @@ from icevision.models.torchvision.fastai.callbacks import *
 
 
 def noop_watch(models, criterion=None, log="gradients", log_freq=1000, idx=None):
-    return []
+    pass
 
 
 def rcnn_learner(
@@ -24,12 +24,9 @@ def rcnn_learner(
         **kwargs,
     )
 
-    # HACK: patch AvgLoss (in original, find_bs gives errors)
     class RCNNAvgLoss(fastai.AvgLoss):
         def accumulate(self, learn):
-            bs = len(first(learn.yb))
-            self.total += fastai.to_detach(learn.loss.mean()) * bs
-            self.count += bs
+            pass
 
     recorder = [cb for cb in learn.cbs if isinstance(cb, fastai.Recorder)][0]
     recorder.loss = RCNNAvgLoss()

@@ -24,64 +24,24 @@ def ObjectDetectionRecord():
 
 
 def InstanceSegmentationRecord():
-    return BaseRecord(
-        (
-            FilepathRecordComponent(),
-            InstancesLabelsRecordComponent(),
-            BBoxesRecordComponent(),
-            InstanceMasksRecordComponent(),
-        )
-    )
+    pass
 
 
 def SemanticSegmentationRecord(gray=False):
-    return BaseRecord(
-        (
-            FilepathRecordComponent(gray=gray),
-            ClassMapRecordComponent(task=tasks.segmentation),
-            SemanticMaskRecordComponent(),
-        )
-    )
+    pass
 
 
 def KeypointsRecord():
-    return BaseRecord(
-        (
-            FilepathRecordComponent(),
-            InstancesLabelsRecordComponent(),
-            BBoxesRecordComponent(),
-            KeyPointsRecordComponent(),
-        )
-    )
+    pass
 
 
 def GrayScaleObjectDetectionRecord():
-    return BaseRecord(
-        (
-            GrayScaleRecordComponent(),
-            InstancesLabelsRecordComponent(),
-            BBoxesRecordComponent(),
-        )
-    )
+    pass
 
 
 def GrayScaleInstanceSegmentationRecord():
-    return BaseRecord(
-        (
-            GrayScaleRecordComponent(),
-            InstancesLabelsRecordComponent(),
-            BBoxesRecordComponent(),
-            MasksRecordComponent(),
-        )
-    )
+    pass
 
 
 def GrayScaleKeypointsRecord():
-    return BaseRecord(
-        (
-            GrayScaleRecordComponent(),
-            InstancesLabelsRecordComponent(),
-            BBoxesRecordComponent(),
-            KeyPointsRecordComponent(),
-        )
-    )
+    pass

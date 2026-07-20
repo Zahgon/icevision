@@ -54,27 +54,13 @@ def infer_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
 def build_train_batch(
     records: Sequence[RecordType],
 ) -> Tuple[dict, List[Dict[str, torch.Tensor]]]:
-    images, labels, bboxes, img_metas = [], [], [], []
-    for record in records:
-        images.append(_img_tensor(record))
-        img_metas.append(_img_meta(record))
-        labels.append(_labels(record))
-        bboxes.append(_bboxes(record))
-
-    data = {
-        "img": torch.stack(images),
-        "img_metas": img_metas,
-        "gt_labels": labels,
-        "gt_bboxes": bboxes,
-    }
-
-    return data, records
+    pass
 
 
 def build_valid_batch(
     records: Sequence[RecordType],
 ) -> Tuple[dict, List[Dict[str, torch.Tensor]]]:
-    return build_train_batch(records=records)
+    pass
 
 
 def build_infer_batch(records):
@@ -92,7 +78,6 @@ def build_infer_batch(records):
 
 
 def _img_tensor(record):
-    # convert from RGB to BGR
     img = record.img[:, :, ::-1].copy()
     return im2tensor(img)
 
@@ -101,8 +86,6 @@ def _img_meta(record):
     img_h, img_w, img_c = record.img.shape
 
     return {
-        # TODO: height and width from sample should be before padding
-        # "img_shape": (record.img_size.height, record.img_size.width, img_c),
         "img_shape": (img_h, img_w, img_c),
         "pad_shape": (img_h, img_w, img_c),
         "scale_factor": np.ones(4),  # TODO: is scale factor correct?

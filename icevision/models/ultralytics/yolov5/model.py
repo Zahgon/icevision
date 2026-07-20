@@ -25,10 +25,6 @@ def model(
     model_name = backbone.model_name
     pretrained = backbone.pretrained
 
-    # this is to remove background from ClassMap as discussed
-    # here: https://github.com/ultralytics/yolov5/issues/2950
-    # and here: https://discord.com/channels/735877944085446747/782062040168267777/836692604224536646
-    # so we should pass `num_classes=parser.class_map.num_classes`
     num_classes -= 1
 
     device = (
@@ -85,21 +81,7 @@ def model(
     model.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
 
     def param_groups_fn(model: nn.Module) -> List[List[nn.Parameter]]:
-        spp_index = [
-            i + 1
-            for i, layer in enumerate(model.model.children())
-            if layer._get_name() == "SPPF"
-        ][0]
-        backbone = list(model.model.children())[:spp_index]
-        neck = list(model.model.children())[spp_index:-1]
-        head = list(model.model.children())[-1]
-
-        layers = [nn.Sequential(*backbone), nn.Sequential(*neck), nn.Sequential(head)]
-
-        param_groups = [list(group.parameters()) for group in layers]
-        check_all_model_params_in_groups2(model.model, param_groups)
-
-        return param_groups
+        pass
 
     model.param_groups = MethodType(param_groups_fn, model)
 

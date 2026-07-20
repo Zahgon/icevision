@@ -72,64 +72,11 @@ def infer_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
 
 
 def build_train_batch(records):
-    """Builds a batch in the format required by the model when training.
-
-    # Arguments
-        records: A `Sequence` of records.
-
-    # Returns
-        A tuple with two items. The first will be a tuple like `(images, targets)`,
-        in the input format required by the model. The second will be a list
-        of the input records.
-
-    # Examples
-
-    Use the result of this function to feed the model.
-    ```python
-    batch, records = build_train_batch(records)
-    outs = model(*batch)
-    ```
-    """
-    batch_images, batch_bboxes, batch_classes = zip(
-        *(process_train_record(record) for record in records)
-    )
-
-    # convert to tensors
-    batch_images = torch.stack(batch_images)
-    batch_bboxes = [tensor(bboxes, dtype=torch.float32) for bboxes in batch_bboxes]
-    batch_classes = [tensor(classes, dtype=torch.float32) for classes in batch_classes]
-
-    # convert to EffDet interface
-    targets = dict(bbox=batch_bboxes, cls=batch_classes)
-
-    return (batch_images, targets), records
+    pass
 
 
 def build_valid_batch(records):
-    """Builds a batch in the format required by the model when validating.
-
-    # Arguments
-        records: A `Sequence` of records.
-
-    # Returns
-        A tuple with two items. The first will be a tuple like `(images, targets)`,
-        in the input format required by the model. The second will be a list
-        of the input records.
-
-    # Examples
-
-    Use the result of this function to feed the model.
-    ```python
-    batch, records = build_valid_batch(records)
-    outs = model(*batch)
-    ```
-    """
-    (batch_images, targets), records = build_train_batch(records)
-
-    # convert to EffDet interface, when not training, dummy size and scale is required
-    targets = dict(img_size=None, img_scale=None, **targets)
-
-    return (batch_images, targets), records
+    pass
 
 
 def build_infer_batch(records):
@@ -152,28 +99,17 @@ def build_infer_batch(records):
         *(process_infer_record(record) for record in records)
     )
 
-    # convert to tensors
     batch_images = torch.stack(batch_images)
     batch_sizes = tensor(batch_sizes, dtype=torch.float32)
     batch_scales = tensor(batch_scales, dtype=torch.float32)
 
-    # convert to EffDet interface
     targets = dict(img_size=batch_sizes, img_scale=batch_scales)
 
     return (batch_images, targets), records
 
 
 def process_train_record(record) -> tuple:
-    """Extracts information from record and prepares a format required by the EffDet training"""
-    image = im2tensor(record.img)
-    # background and dummy if no label in record
-    classes = record.detection.label_ids if record.detection.label_ids else [0]
-    bboxes = (
-        [bbox.yxyx for bbox in record.detection.bboxes]
-        if len(record.detection.label_ids) > 0
-        else [[0, 0, 0, 0]]
-    )
-    return image, bboxes, classes
+    pass
 
 
 def process_infer_record(record) -> tuple:
@@ -181,5 +117,4 @@ def process_infer_record(record) -> tuple:
     image = im2tensor(record.img)
     n_channels, image_height, image_width = image.shape
     image_scale = 1.0
-    # EffDet expects image size to be passed in W, H notation
     return image, (image_width, image_height), image_scale

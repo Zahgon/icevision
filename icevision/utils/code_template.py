@@ -15,11 +15,10 @@ class CodeTemplate:
         self.indent_str = " " * indent_spaces
 
     def add_line(self, line: str, indent=0):
-        self.lines.append(CodeLine(line, indent))
+        pass
 
     def add_lines(self, lines: Sequence[str], indent=0):
-        for line in lines:
-            self.add_line(line, indent)
+        pass
 
     def display(self):
         for line in self.lines:

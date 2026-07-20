@@ -31,16 +31,6 @@ logger_default_config()
 
 
 class ReplaySink:
-    """Capture messages and replays them after leaving the block.
-
-    # Examples
-    ```python
-    pre_replay = lambda: logger.info("something will happen")
-    post_replay = lambda: logger.info("something did happen")
-    with ReplaySink(pre_replay=pre_replay, post_replay=post_replay) as sink:
-        logger.info('captured message')
-    ```
-    """
 
     def __init__(
         self,
@@ -74,7 +64,6 @@ class ReplaySink:
                 try:
                     logger.level(level)
                 except ValueError:
-                    # If the level 'name' is not registered, use its 'no' instead
                     level = record["level"].no
 
                 patched = logger.patch(lambda r: r.update(record))

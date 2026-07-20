@@ -14,28 +14,9 @@ def voc(
     masks_dir: Optional[Union[str, Path]] = None,
     idmap: Optional[IDMap] = None,
 ):
-    logger.warning(
-        "This function will be deprecated, instantiate the concrete "
-        "classes instead: `VOCBBoxParser`, `VOCMaskParser`"
-    )
-    if not masks_dir:
-        return VOCBBoxParser(
-            annotations_dir=annotations_dir,
-            images_dir=images_dir,
-            class_map=class_map,
-            idmap=idmap,
-        )
-    else:
-        return VOCMaskParser(
-            annotations_dir=annotations_dir,
-            images_dir=images_dir,
-            masks_dir=masks_dir,
-            class_map=class_map,
-            idmap=idmap,
-        )
+    pass
 
 
-# TODO: Rename to VOCBBoxParser?
 class VOCBBoxParser(Parser):
     def __init__(
         self,
@@ -58,64 +39,28 @@ class VOCBBoxParser(Parser):
         yield from self.annotation_files
 
     def template_record(self) -> BaseRecord:
-        return BaseRecord(
-            (
-                FilepathRecordComponent(),
-                InstancesLabelsRecordComponent(),
-                BBoxesRecordComponent(),
-            )
-        )
+        pass
 
     def record_id(self, o) -> Hashable:
-        return str(Path(self._filename).stem)
+        pass
 
     def prepare(self, o):
-        tree = ET.parse(str(o))
-        self._root = tree.getroot()
-        self._filename = self._root.find("filename").text
-        self._size = self._root.find("size")
+        pass
 
     def parse_fields(self, o, record, is_new):
-        if is_new:
-            record.set_filepath(self.filepath(o))
-            record.set_img_size(self.img_size(o))
-
-        record.detection.set_class_map(self.class_map)
-        record.detection.add_labels(self.labels(o))
-        record.detection.add_bboxes(self.bboxes(o))
+        pass
 
     def filepath(self, o) -> Union[str, Path]:
-        return self.images_dir / self._filename
+        pass
 
     def img_size(self, o) -> ImgSize:
-        width = int(self._size.find("width").text)
-        height = int(self._size.find("height").text)
-        return ImgSize(width=width, height=height)
+        pass
 
     def labels(self, o) -> List[Hashable]:
-        labels = []
-        for object in self._root.iter("object"):
-            label = object.find("name").text
-            labels.append(label)
-
-        return labels
+        pass
 
     def bboxes(self, o) -> List[BBox]:
-        def to_int(x):
-            return int(float(x))
-
-        bboxes = []
-        for object in self._root.iter("object"):
-            xml_bbox = object.find("bndbox")
-            xmin = to_int(xml_bbox.find("xmin").text)
-            ymin = to_int(xml_bbox.find("ymin").text)
-            xmax = to_int(xml_bbox.find("xmax").text)
-            ymax = to_int(xml_bbox.find("ymax").text)
-
-            bbox = BBox.from_xyxy(xmin, ymin, xmax, ymax)
-            bboxes.append(bbox)
-
-        return bboxes
+        pass
 
 
 class VOCMaskParser(VOCBBoxParser):
@@ -138,7 +83,6 @@ class VOCMaskParser(VOCBBoxParser):
 
         self._record_id2maskfile = {self.record_id_mask(o): o for o in self.mask_files}
 
-        # filter annotations
         masks_ids = frozenset(self._record_id2maskfile.keys())
         self._intersection = []
         for item in super().__iter__():
@@ -153,18 +97,13 @@ class VOCMaskParser(VOCBBoxParser):
         yield from self._intersection
 
     def template_record(self) -> BaseRecord:
-        record = super().template_record()
-        record.add_component(InstanceMasksRecordComponent())
-        return record
+        pass
 
     def record_id_mask(self, o) -> Hashable:
-        """Should return the same as `record_id` from parent parser."""
-        return str(Path(o).stem)
+        pass
 
     def parse_fields(self, o, record, is_new):
-        super().parse_fields(o, record, is_new=is_new)
-        record.detection.add_masks(self.masks(o))
+        pass
 
     def masks(self, o) -> List[Mask]:
-        mask_file = self._record_id2maskfile[self.record_id(o)]
-        return [VocMaskFile(mask_file)]
+        pass

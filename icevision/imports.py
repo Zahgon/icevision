@@ -55,7 +55,6 @@ from torchvision.transforms.functional import to_tensor as im2tensor
 
 from loguru import logger
 
-# Soft imports
 from icevision.soft_dependencies import SoftDependencies
 
 if SoftDependencies.fastai:
@@ -72,12 +71,7 @@ if SoftDependencies.sklearn:
     import sklearn
 
 
-# TODO: Stop importing partial from fastcore and move this to utils
 class partial:
-    """Wraps functools.partial, same functionality.
-
-    Modifies the original partial `__repr__` and `__str__` in other to fix #270
-    """
 
     def __init__(self, func, *args, **kwargs):
         self._partial = functools.partial(func, *args, **kwargs)

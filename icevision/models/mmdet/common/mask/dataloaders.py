@@ -60,29 +60,13 @@ def infer_dl(dataset, batch_tfms=None, **dataloader_kwargs) -> DataLoader:
 def build_valid_batch(
     records: Sequence[RecordType],
 ) -> Tuple[dict, List[Dict[str, torch.Tensor]]]:
-    return build_train_batch(records=records)
+    pass
 
 
 def build_train_batch(
     records: Sequence[RecordType],
 ) -> Tuple[dict, List[Dict[str, torch.Tensor]]]:
-    images, labels, bboxes, masks, img_metas = [], [], [], [], []
-    for record in records:
-        images.append(_img_tensor(record))
-        img_metas.append(_img_meta_mask(record))
-        labels.append(_labels(record))
-        bboxes.append(_bboxes(record))
-        masks.append(_masks(record))
-
-    data = {
-        "img": torch.stack(images),
-        "img_metas": img_metas,
-        "gt_labels": labels,
-        "gt_bboxes": bboxes,
-        "gt_masks": masks,
-    }
-
-    return data, records
+    pass
 
 
 def build_infer_batch(records):
@@ -106,11 +90,4 @@ def _img_meta_mask(record):
 
 
 def _masks(record):
-    if len(record.detection.masks) == 0:
-        raise RuntimeError(
-            "Negative samples still needs to be implemented. This error might appear due to cropping, please check your transformations."
-        )
-    else:
-        mask = record.detection.mask_array.data
-        _, h, w = mask.shape
-        return BitmapMasks(mask, height=h, width=w)
+    pass

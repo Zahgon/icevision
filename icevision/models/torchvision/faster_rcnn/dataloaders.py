@@ -80,8 +80,6 @@ def _build_train_sample(
     image = im2tensor(record.img)
     target = {}
 
-    # If no labels and bboxes are present, use as negative samples as described in
-    # https://github.com/pytorch/vision/releases/tag/v0.6.0
     if len(record.detection.label_ids) == 0:
         target["labels"] = torch.zeros(0, dtype=torch.int64)
         target["boxes"] = torch.zeros((0, 4), dtype=torch.float32)
@@ -96,57 +94,13 @@ def _build_train_sample(
 def build_train_batch(
     records: Sequence[RecordType],
 ) -> Tuple[List[torch.Tensor], List[Dict[str, torch.Tensor]]]:
-    """Builds a batch in the format required by the model when training.
-
-    # Arguments
-        records: A `Sequence` of records.
-        batch_tfms: Transforms to be applied at the batch level.
-
-    # Returns
-        A tuple with two items. The first will be a tuple like `(images, targets)`,
-        in the input format required by the model. The second will be a list
-        of the input records.
-
-    # Examples
-
-    Use the result of this function to feed the model.
-    ```python
-    batch, records = build_train_batch(records)
-    outs = model(*batch)
-    ```
-    """
-    images, targets = [], []
-    for record in records:
-        image, target = _build_train_sample(record)
-        images.append(image)
-        targets.append(target)
-
-    return (images, targets), records
+    pass
 
 
 def build_valid_batch(
     records: List[RecordType],
 ) -> Tuple[List[torch.Tensor], Dict[str, torch.Tensor]]:
-    """Builds a batch in the format required by the model when validating.
-
-    # Arguments
-        records: A `Sequence` of records.
-        batch_tfms: Transforms to be applied at the batch level.
-
-    # Returns
-        A tuple with two items. The first will be a tuple like `(images, targets)`,
-        in the input format required by the model. The second will be a list
-        of the input records.
-
-    # Examples
-
-    Use the result of this function to feed the model.
-    ```python
-    batch, records = build_valid_batch(records)
-    outs = model(*batch)
-    ```
-    """
-    return build_train_batch(records=records)
+    pass
 
 
 def build_infer_batch(records: Sequence[RecordType]):

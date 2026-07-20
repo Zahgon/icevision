@@ -23,32 +23,13 @@ class RCNNModelAdapter(LightningModelAdapter, ABC):
         """Convert raw predictions from the model to library standard."""
 
     def forward(self, *args, **kwargs):
-        return self.model(*args, **kwargs)
+        pass
 
     def training_step(self, batch, batch_idx):
-        (xb, yb), records = batch
-        preds = self(xb, yb)
-
-        loss = loss_fn(preds, yb)
-        self.log("train_loss", loss)
-
-        return loss
+        pass
 
     def validation_step(self, batch, batch_idx):
-        (xb, yb), records = batch
-        with torch.no_grad():
-            self.train()
-            train_preds = self(xb, yb)
-            loss = loss_fn(train_preds, yb)
-
-            self.eval()
-            raw_preds = self(xb)
-            preds = self.convert_raw_predictions(
-                batch=batch, raw_preds=raw_preds, records=records
-            )
-            self.accumulate_metrics(preds=preds)
-
-        self.log("val_loss", loss)
+        pass
 
     def validation_epoch_end(self, outs):
-        self.finalize_metrics()
+        pass

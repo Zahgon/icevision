@@ -14,15 +14,7 @@ class RecordCollection:
         self._records = IndexableDict()
 
     def get_by_record_id(self, record_id):
-        try:
-            record = self._records[record_id]
-            record.is_new = False
-            return record
-        except KeyError:
-            record = self._records[record_id] = self.create_record_fn()
-            record.set_record_id(record_id)
-            record.is_new = True
-            return record
+        pass
 
     def new(self, records: Sequence[BaseRecord]) -> RecordCollection:
         new = type(self)(self.create_record_fn)
@@ -33,11 +25,7 @@ class RecordCollection:
         return self.new([*self._records.values(), *other._records.values()])
 
     def make_splits(self, data_splitter: DataSplitter) -> List[RecordCollection]:
-        record_id_splits = data_splitter.split(self)
-        return [
-            self.new([self._records[record_id] for record_id in record_ids])
-            for record_ids in record_id_splits
-        ]
+        pass
 
     def autofix(self, show_pbar: int = True):
         records = autofix_records(self._records.values())
